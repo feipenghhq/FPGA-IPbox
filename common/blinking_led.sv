@@ -30,7 +30,7 @@ reg [WIDTH-1:0] count;
 always_ff @(posedge clk) begin
     if (rst) begin
         count <= 'b0;
-        led   <= 4'b0001;
+        led   <= 'b1;
     end
     else begin
         if (count == CYCLE) begin

@@ -11,7 +11,7 @@
 //  Header file for VGA controller
 //  The header defines different paramete for different resolution
 //
-//  See http://tinyvga.com/vga-timing 
+//  See http://tinyvga.com/vga-timing
 //  for more detail vga timing for different resoultion
 ///////////////////////////////////////////////////////////////////////////////
 
