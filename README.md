@@ -15,6 +15,18 @@ Some utilities for the Arty-A7 FPGA Board
 
 
 
+## Altera-DEX
+
+Some IPs for the Altera-DE series FPGA board
+
+| IPs                 | Description                          | Board |
+| ------------------- | ------------------------------------ | ----- |
+| avm_sram_controller | Avalon Memory Mapped SRAM Controller | DE2   |
+|                     |                                      |       |
+|                     |                                      |       |
+
+
+
 ## Common
 
 Some common utilities used across different modules
