@@ -3,7 +3,7 @@
 # =============================
 
 # Verilog src path
-SRC_PATH = ../src/
+SRC_PATH = ../rtl/
 
 ALL_SRC_FILES = $(shell find $(SRC_PATH) -type f)
 

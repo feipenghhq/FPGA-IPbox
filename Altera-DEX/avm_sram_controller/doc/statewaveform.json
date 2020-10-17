@@ -5,6 +5,7 @@
   { name: "sram_ce_n",	wave: "1.0.1.."},
   { name: "sram_we_n",	wave: "1......"},
   { name: "sram_data",  wave: "xx23xxx",  data: ["DW0", "DW1"] },
+  { name: "avm_readdata",  wave: "xxxx2xx",  data: ["Data"] },  
   ],
   config: { hscale: 3 }
 }

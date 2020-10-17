@@ -13,10 +13,19 @@
 //  This version support 32 bit data width. It has register at both input and output
 //  to improve timing but introducing 1 extra latency.
 //
-//  Read  latency: 3
-//  Write latency: 3
-//
 //  Max clock speed supported 50Mhz (limited by the SRAM)
+//
+//  **** Important ****
+//
+//  1. The avm_address input should be a byte address, not a word address.
+//     So when you create a QSYS component of this IP, the address unit should be "SYMBOL"
+//     And the bit per symbol is 8.
+//     This is very important for this IP to work
+//
+//  2. Latency:
+//      Read  latency: 3
+//      Write latency: 3
+//
 //
 //  ================== Revision 1.0 ==================
 //
@@ -44,7 +53,7 @@ module avm_sram_controller
     input                   reset,
 
     // Avalon MM slave interface
-    input      [17:0]       avm_address,
+    input      [18:0]       avm_address,    // Support 512KByte Address Range,  byte address
     input      [3:0]        avm_byteenable,
     input                   avm_read,
     input                   avm_write,
@@ -100,9 +109,10 @@ module avm_sram_controller
     begin
         case(state)
             S_IDLE:begin // Idle state, capture the input
-                avm_address_dw1     <= avm_address | 18'b10;
                 avm_writedata_dw1   <= avm_writedata[31:16];
                 avm_byteenable_dw1  <= avm_byteenable[3:2];
+                // the SRAM is arranged as 256K x 16b so the LSb from avm_address is not used
+                avm_address_dw1     <= avm_address[18:1] | 17'h1;                
             end
             S_DW0:begin // DW1 is availabe at the end of S_CAPTURE state
                 avm_readdata[15:0]  <= sram_readdata;
@@ -133,14 +143,15 @@ module avm_sram_controller
                     sram_oe_n   <= ~avm_read;
                     sram_we_n   <= ~avm_write;
                     sram_ub_n   <= ~avm_byteenable[1];
-                    sram_lb_n   <= ~avm_byteenable[0];
-                    sram_addr   <= avm_address;
+                    sram_lb_n   <= ~avm_byteenable[0]; 
                     sram_writedata  <= avm_writedata[15:0];
+                    // Note: the SRAM is arranged as 256K x 16b so the LSb from avm_address is not used
+                    sram_addr   <= avm_address[18:1];                      
                 end
                 S_DW0:begin
                     sram_ub_n   <= ~avm_byteenable_dw1[1];
                     sram_lb_n   <= ~avm_byteenable_dw1[0];
-                    sram_addr   <= avm_address_dw1;         // The address should be 4 byte aligned
+                    sram_addr   <= avm_address_dw1;
                     sram_writedata  <= avm_writedata_dw1;
                 end
                 S_DW1:begin
