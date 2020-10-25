@@ -1,41 +1,38 @@
-# FPGA-IPbox
+# FPGA IP Box
 
 [TOC]
 
-Some common and useful FPGA IP.
+Some common and useful FPGA IP for my project.
 
 ## Arty-A7
 
-Some utilities for the Arty-A7 FPGA Board
+IPs/Files for the Arty-A7 FPGA Board. 
 
-| File                 | Description                                   |
-| -------------------- | --------------------------------------------- |
-| Arty_Top.v           | A simple top level file for the Arty-A7 board |
-| pmod_7seg_display.sv | Pmod seven segment display driver             |
+More info: [DOC](./Arty-A7/doc/SPEC.md)
 
 
 
 ## Altera-DEX
 
-Some IPs for the Altera-DE series FPGA board
-
-| IPs                 | Description                          | Board |
-| ------------------- | ------------------------------------ | ----- |
-| avm_sram_controller | Avalon Memory Mapped SRAM Controller | DE2   |
-|                     |                                      |       |
-|                     |                                      |       |
+IPs/Files for the Altera-DE series FPGA board. Currently Empty
 
 
 
-## Common
+## Common IPs/Files
 
-Some common utilities used across different modules
+Some common IPs/Files used across different modules. 
 
-| File            | Description                             |
-| --------------- | --------------------------------------- |
-| blinking_led.sv | Blink the LED. FPGA Hello World program |
-| fifo.sv         | Basic synchronous FIFO                  |
-| dsync.sv        | 2 Stage D Flip Flop synchronizer        |
+More info: [DOC](./common/doc/SPEC.md)
+
+
+
+## SRAM Controller
+
+An Avalon Memory SRAM controller. Designed for the SRAM chip Terasic DE1/DE2 FPGA board.
+
+The SRAM chip used in the FPGA board is **IS61LV25616** from ISSI.
+
+More info: [DOC](sram_controller/doc/avm_sram_controller.md)
 
 
 

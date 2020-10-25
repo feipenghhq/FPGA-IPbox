@@ -43,7 +43,7 @@ help:
 	@echo 	"make tb   	- compile source rtl and testbench"
 	@echo	"make rtl  	- compile rtl"
 	@echo   "make clean	- clean all the output"
-	@echo	"make link	- lint the design using verilator"
+	@echo	"make lint	- lint the design using verilator"
 
 wave: $(WAVE)
 	gtkwave $(WAVE)

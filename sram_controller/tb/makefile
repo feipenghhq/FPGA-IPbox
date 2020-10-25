@@ -12,4 +12,4 @@ TOP_FILE 	= $(SRC_PATH)$(TOP_DESIGN).v
 TB_TOP		= $(TOP_DESIGN)_tb.v
 WAVE		= dump.vcd
 
-include ../../../script/makefile_iverilog.mk
+include ../../script/makefile_iverilog.mk

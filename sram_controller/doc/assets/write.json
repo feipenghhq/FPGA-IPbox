@@ -1,0 +1,12 @@
+{ signal: [
+  { name: "clk",     	wave: "p......" },
+  {},
+  { name: "avm_write", 	wave: "010...." },
+  { name: "avm_writedata",  wave: "x2xxxxx",  data: ["Write Data"] },   
+  {},
+  { name: "sram_dq",  wave: "xx23xxx",  data: ["DW0", "DW1"] },
+  {},  
+  { name: "Internal State",    	wave: "x345xxx",  data: ["S_IDLE", "S_DW0", "S_DW1"] }, 
+  ],
+  config: { hscale: 3 }
+}
