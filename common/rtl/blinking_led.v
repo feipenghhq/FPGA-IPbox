@@ -27,7 +27,7 @@ localparam WIDTH2 = $clog2(LED);
 
 reg [WIDTH-1:0] count;
 
-always_ff @(posedge clk) begin
+always @(posedge clk) begin
     if (rst) begin
         count <= 'b0;
         led   <= 'b1;

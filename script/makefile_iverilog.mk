@@ -65,7 +65,7 @@ $(RTL_OUT):	$(TOP_FILE) $(ALL_SRC_FILES)
 	$(IVERILOG) -o $(RTL_OUT) $(TOP_FILE) -y $(SRC_PATH)
 
 lint:
-	@verilator  -Wall -lint-only $(TOP_FILE) -y SRC_PATH
+	@verilator  -Wall -lint-only $(TOP_FILE) -y $(SRC_PATH)
 	@echo "No Issue Found"
 
 clean:

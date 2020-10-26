@@ -24,7 +24,7 @@ input   rst
 reg [STAGE-1:0] sync;
 integer i;
 
-always_ff @(posedge clk) begin
+always @(posedge clk) begin
     if (rst) sync <= 'b0;
     else begin
         sync[0] <= D;
