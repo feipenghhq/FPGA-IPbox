@@ -5,7 +5,7 @@
 #
 # Need to setup the following variable from the source makefile
 #
-# 	SRC_PATH	: RTL source directories
+# 	RTL_PATH	: RTL source directories
 # 	TOP_DESIGN	: Top level rtl module name
 # 	TOP_FILE 	: Top level rtl file
 # 	TB_TOP		: Testbench top level file
@@ -25,7 +25,7 @@ VERILATOR	= verilator
 # Variable
 # =============================
 
-ALL_SRC_FILES = $(shell find $(SRC_PATH) -type f)
+ALL_SRC_FILES = $(shell find $(RTL_PATH) -type f)
 RTL_OUT		  = $(TOP_DESIGN)
 TB_OUT		  = $(TOP_DESIGN)_tb
 
@@ -57,15 +57,15 @@ run: $(TB_OUT)
 tb: $(TB_OUT)
 
 $(TB_OUT): $(TB_TOP) $(TOP_FILE) $(ALL_SRC_FILES)
-	$(IVERILOG) -o $(TB_OUT) $(TB_TOP) -y $(SRC_PATH)
+	$(IVERILOG) -o $(TB_OUT) $(TB_TOP) -y $(RTL_PATH) -y $(TB_PATH)
 
 rtl: $(RTL_OUT)
 
 $(RTL_OUT):	$(TOP_FILE) $(ALL_SRC_FILES)
-	$(IVERILOG) -o $(RTL_OUT) $(TOP_FILE) -y $(SRC_PATH)
+	$(IVERILOG) -o $(RTL_OUT) $(TOP_FILE) -y $(RTL_PATH)
 
 lint:
-	@verilator  -Wall -lint-only $(TOP_FILE) -y $(SRC_PATH)
+	@verilator  -Wall -lint-only $(TOP_FILE) -y $(RTL_PATH)
 	@echo "No Issue Found"
 
 clean:

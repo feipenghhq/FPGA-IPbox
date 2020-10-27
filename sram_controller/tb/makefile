@@ -3,12 +3,13 @@
 # =============================
 
 # Verilog src path
-SRC_PATH = ../rtl/
+RTL_PATH = ../rtl/
+TB_PATH = ./
 
-ALL_SRC_FILES = $(shell find $(SRC_PATH) -type f)
+ALL_SRC_FILES = $(shell find $(RTL_PATH) -type f)
 
 TOP_DESIGN	= avm_sram_controller
-TOP_FILE 	= $(SRC_PATH)$(TOP_DESIGN).v
+TOP_FILE 	= $(RTL_PATH)$(TOP_DESIGN).v
 TB_TOP		= $(TOP_DESIGN)_tb.v
 WAVE		= dump.vcd
 
