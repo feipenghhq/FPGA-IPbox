@@ -24,10 +24,12 @@ VERILATOR	= verilator
 # =============================
 # Variable
 # =============================
+OUT_DIR		  = output
 
 ALL_SRC_FILES = $(shell find $(RTL_PATH) -type f)
-RTL_OUT		  = $(TOP_DESIGN)
-TB_OUT		  = $(TOP_DESIGN)_tb
+RTL_OUT		  = $(OUT_DIR)/$(TOP_DESIGN)
+TB_OUT		  = $(OUT_DIR)/$(TOP_DESIGN)_tb
+
 
 # =============================
 # Command
@@ -56,10 +58,10 @@ run: $(TB_OUT)
 
 tb: $(TB_OUT)
 
-$(TB_OUT): $(TB_TOP) $(TOP_FILE) $(ALL_SRC_FILES)
+$(TB_OUT): $(TB_TOP) $(TOP_FILE) $(ALL_SRC_FILES) $(OUT_DIR)
 	$(IVERILOG) -o $(TB_OUT) $(TB_TOP) -y $(RTL_PATH) -y $(TB_PATH)
 
-rtl: $(RTL_OUT)
+rtl: $(OUT_DIR) $(RTL_OUT)
 
 $(RTL_OUT):	$(TOP_FILE) $(ALL_SRC_FILES)
 	$(IVERILOG) -o $(RTL_OUT) $(TOP_FILE) -y $(RTL_PATH)
@@ -68,5 +70,8 @@ lint:
 	@verilator  -Wall -lint-only $(TOP_FILE) -y $(RTL_PATH)
 	@echo "No Issue Found"
 
+$(OUT_DIR):
+	mkdir $(OUT_DIR)
+
 clean:
-	rm -rf $(TB_OUT) $(RTL_OUT) *.out *.vcd
+	rm -rf $(OUT_DIR) *.vcd

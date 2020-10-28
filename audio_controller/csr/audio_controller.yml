@@ -1,0 +1,65 @@
+register:
+
+  status:
+    i2c_idle:
+      size: 1
+      reset: 0x1
+      swtype: R
+      hwtype: W
+      note: '1 - I2C controller is idle, 0 - I2C controller is busy'
+    dac_fifo_full:
+      size: 1
+      reset: 0x0
+      swtype: R
+      hwtype: W
+      note: '1 - DAC FIFO is full, 0 - DAC FIFO not full'
+    adc_fifo_empty:
+      size: 1
+      reset: 0x1
+      swtype: R
+      hwtype: W
+      note: '1 - ADC FIFO is empty, 0 - ADC FIFO not empty'
+
+  ctrl:
+    dac_sel:
+      size: 1
+      reset: 0x1
+      swtype: W
+      hwtype: R
+      note: 'DAC data stream comes from: 1 - conduit interface, 0 -  Avalon MM interface'
+    adc_sel:
+      size: 1
+      reset: 0x1
+      swtype: W
+      hwtype: R
+      note: 'ADC data stream comes from: 1 - conduit interface, 0 -  Avalon MM interface'
+
+  adc_data:
+    data:
+      size: 32
+      reset: 0x0
+      swtype: FIFOR
+      hwtype: NA
+      note: '32-bit audio data from ADC'
+
+  dac_data:
+    data:
+      size: 32
+      reset: 0x0
+      swtype: FIFOW
+      hwtype: NA
+      note: '32-bit audio data to DAC'
+
+  i2c_ctrl:
+    data:
+      size: 24
+      reset: 0x0
+      swtype: W
+      hwtype: R
+      note: 'I2C write data'
+    write:
+      size: 1
+      reset: 0x0
+      swtype: W
+      hwtype: R
+      note: 'Initiate I2C write transaction. SW need to clear it to zero before next write'
