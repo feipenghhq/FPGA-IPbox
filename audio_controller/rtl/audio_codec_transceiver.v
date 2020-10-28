@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Project Name: WM8731/WM8731L Audio Controller
-// Module Name: codec_transceiver
+// Module Name: audio_codec_transceiver
 //
 // Author: Heqing Huang
 // Date Created: 10/27/2019
@@ -18,7 +18,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-module codec_transceiver #(
+module audio_codec_transceiver #(
 parameter SYSCLK = 50000,       // System clock rate in KHz
 parameter MCLK   = 12288,       // MCLK clock rate in KHz
 parameter WIDTH  = 32           // L + R channel: 16 + 16 => 32
@@ -120,8 +120,8 @@ always @(posedge clk) begin
     end
 end
 
-assign lrc_negedge = mclk_negedge & (lrc_counter == (WIDTH / 2 - 1));
-assign lrc_posedge = mclk_negedge & (lrc_counter == (WIDTH - 1));
+assign lrc_negedge = mclk_negedge & (lrc_counter == (WIDTH[LRC_CNT_WIDTH-1:0] / 2 - 1));
+assign lrc_posedge = mclk_negedge & (lrc_counter == (WIDTH[LRC_CNT_WIDTH-1:0] - 1));
 assign lrc_toggle  = lrc_posedge | lrc_negedge;
 
 always @(posedge clk) begin

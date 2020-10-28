@@ -14,7 +14,7 @@
 
 `timescale 1ns/1ns
 
-module codec_transceiver_tb();
+module audio_codec_transceiver_tb();
 
 parameter CLK_FREQ = 50;       // System clock rate in KHz
 parameter WIDTH  = 32;          // L + R channel: 16 + 16 => 32
@@ -43,8 +43,8 @@ integer               error;
 integer               i;
 integer               j;
 
-codec_transceiver     DUT_codec_transceiver (.*);
-codec_transceiver_bfm codec_transceiver_bfm (.*);
+audio_codec_transceiver     DUT_audio_codec_transceiver (.*);
+audio_codec_transceiver_bfm audio_codec_transceiver_bfm (.*);
 
 // ================================================
 // Main test
@@ -131,7 +131,7 @@ end
 initial
 begin
     $dumpfile("dump.vcd");
-    $dumpvars(0, codec_transceiver_tb);
+    $dumpvars(0, audio_codec_transceiver_tb);
 end
 
 // ================================================

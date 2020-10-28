@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Project Name: WM8731/WM8731L Audio Controller
-// Module Name: codec_transceiver_bfm
+// Module Name: audio_codec_transceiver_bfm
 //
 // Author: Heqing Huang
 // Date Created: 10/27/2019
@@ -14,7 +14,7 @@
 
 `timescale 1ns/1ns
 
-module codec_transceiver_bfm #(
+module audio_codec_transceiver_bfm #(
 parameter DELTA  = 1,
 parameter WIDTH  = 32           // L + R channel: 16 + 16 => 32
 ) (

@@ -9,7 +9,7 @@ TB_PATH  = ./
 ALL_SRC_FILES = $(shell find $(RTL_PATH) -type f)
 
 ifeq ($(TOP),)
-	TOP_DESIGN	= codec_transceiver
+	TOP_DESIGN	= audio_controller
 else
 	TOP_DESIGN	= $(TOP)
 endif
