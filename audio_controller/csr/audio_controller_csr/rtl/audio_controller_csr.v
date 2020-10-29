@@ -75,7 +75,7 @@ module audio_controller_csr
   // read decode logic
   always @(*) begin
     case(i_sw_address)
-      5'h0:  o_sw_rddata_next = {29'b0, i_hw_status_adc_fifo_empty_q, i_hw_status_dac_fifo_full_q, 
+      5'h0:  o_sw_rddata_next = {29'b0, i_hw_status_adc_fifo_empty_q, i_hw_status_dac_fifo_full_q,
                                  i_hw_status_i2c_idle_q};
       5'h4:  o_sw_rddata_next = {30'b0, o_hw_ctrl_adc_sel_q, o_hw_ctrl_dac_sel_q};
       5'h8:  o_sw_rddata_next = {i_hw_adc_data_data_fifo_read_data};
@@ -93,6 +93,10 @@ module audio_controller_csr
 
   // software write decode Logic
   always @(*) begin
+        o_hw_ctrl_dac_sel_q_wen = 1'b0;
+        o_hw_ctrl_adc_sel_q_wen = 1'b0;
+        o_hw_i2c_ctrl_data_q_wen = 1'b0;
+        o_hw_i2c_ctrl_write_q_wen = 1'b0;
     case(i_sw_address)
       5'h4: begin
         o_hw_ctrl_dac_sel_q_wen = i_sw_write & i_sw_select;
@@ -102,7 +106,7 @@ module audio_controller_csr
         o_hw_i2c_ctrl_data_q_wen = i_sw_write & i_sw_select;
         o_hw_i2c_ctrl_write_q_wen = i_sw_write & i_sw_select;
       end
-      default: begin;
+      default: begin
         o_hw_ctrl_dac_sel_q_wen = 1'b0;
         o_hw_ctrl_adc_sel_q_wen = 1'b0;
         o_hw_i2c_ctrl_data_q_wen = 1'b0;

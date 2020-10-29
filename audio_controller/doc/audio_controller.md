@@ -50,6 +50,14 @@ Configuration and status register module. Provides configuration and status repo
 
 
 
+## Register Space
+
+The audio controller implements the following register space:
+
+[Audio Controller Register Map](./../csr/audio_controller_csr/doc/audio_controller_csr.html)
+
+
+
 ## WM8731/WM8731L Chip Introduction
 
 > This section are mainly copied from the WM8731 / WM8731L datasheet.

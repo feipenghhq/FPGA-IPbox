@@ -53,12 +53,12 @@ begin
     begin
         if (!empty && read)
         begin
-            rdptr <= rdptr + 1;
+            rdptr <= rdptr + 1'b1;
         end
 
         if (!full && write)
         begin
-            wtptr <= wtptr + 1;
+            wtptr <= wtptr + 1'b1;
         end
     end
 end

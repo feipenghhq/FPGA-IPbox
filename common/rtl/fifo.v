@@ -11,7 +11,7 @@
 // Revision 1.0:
 //  Basic FIFO design with full/empty flag. No overflow/underflow error
 //  checking. Read latency is 1.
-// 
+//
 ///////////////////////////////////////////////////////////////////////////////
 
 module fifo #(
@@ -33,9 +33,9 @@ localparam DEPTH = 2**AWIDTH;
 reg [DWIDTH-1:0]  mem[2**AWIDTH-1:0];   // Only this style works in vivado.
 reg [AWIDTH:0]    rdptr;                // read pointer - use AWIDTH bit to avoid turn-around issue. only use AWIDTH-1 bit to retrive data
 reg [AWIDTH:0]    wtptr;                // write pointer - use AWIDTH bit to avoid turn-around issue. only use AWIDTH-1 bit to retrive data
-reg [DWIDTH-1:0]  data_out;             
-wire              ren;                  
-wire              wen;                  
+reg [DWIDTH-1:0]  data_out;
+wire              ren;
+wire              wen;
 
 //========================
 // FIFO control logic
@@ -51,12 +51,12 @@ begin
     begin
         if (!empty && read)
         begin
-            rdptr <= rdptr + 1;
+            rdptr <= rdptr + 1'b1;
         end
 
         if (!full && write)
         begin
-            wtptr <= wtptr + 1;
+            wtptr <= wtptr + 1'b1;
         end
     end
 end

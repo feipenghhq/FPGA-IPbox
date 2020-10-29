@@ -43,9 +43,11 @@ input           adcdat,
 // user interface to ADC/DAC data
 input  [31:0]   dac_data_in,
 input           dac_data_wr,
+output          dac_fifo_full,
 output [31:0]   adc_data_out, // This data is from FWFT FIFO so data is avaliable
                               // at same cycle when adc_data_rd is asserted
-input           adc_data_rd
+input           adc_data_rd,
+output          adc_fifo_empty
 );
 
 // ================================================
@@ -85,14 +87,13 @@ wire            dac_fifo_read;
 wire [31:0]     dac_fifo_read_data;
 wire            dac_fifo_write;
 wire [31:0]     dac_fifo_write_data;
-wire            dac_fifo_full;
+
 
 // ADC FIFO related signal
 wire            adc_fifo_read;
 wire [31:0]     adc_fifo_read_data;
 wire            adc_fifo_write;
 wire [31:0]     adc_fifo_write_data;
-wire            adc_fifo_empty;
 
 // Audio Codec related signal
 wire [31:0]     dacdat_in;
