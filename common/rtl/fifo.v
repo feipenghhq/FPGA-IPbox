@@ -16,7 +16,7 @@
 
 module fifo #(
 parameter DWIDTH = 32,          // Data width
-parameter AWIDTH = 4            // Address width. Depth of the FIFO = 2^AWIDTH
+parameter DEPTH = 4
 ) (
 input               rst,
 input               clk,
@@ -28,7 +28,7 @@ output              full,
 output              empty
 );
 
-localparam DEPTH = 2**AWIDTH;
+localparam AWIDTH = $clog2(DEPTH);
 
 reg [DWIDTH-1:0]  mem[2**AWIDTH-1:0];   // Only this style works in vivado.
 reg [AWIDTH:0]    rdptr;                // read pointer - use AWIDTH bit to avoid turn-around issue. only use AWIDTH-1 bit to retrive data

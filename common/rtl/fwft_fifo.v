@@ -10,13 +10,11 @@
 //
 // First Word Fall Through FIFO.
 //
-//
 ///////////////////////////////////////////////////////////////////////////////
 
 module fwft_fifo #(
 parameter DWIDTH = 32,          // Data width
-parameter SIZE   = 4,           // Size of the FIFO width.
-parameter AWIDTH = $clog2(SIZE)
+parameter DEPTH  = 4
 ) (
 input               rst,
 input               clk,
@@ -28,7 +26,7 @@ output              full,
 output              empty
 );
 
-localparam DEPTH = 2**AWIDTH;
+localparam AWIDTH = $clog2(DEPTH);
 
 reg [DWIDTH-1:0]  mem[2**AWIDTH-1:0];   // Only this style works in vivado.
 reg [AWIDTH:0]    rdptr;                // FIFO read pointer
@@ -37,7 +35,7 @@ reg [DWIDTH-1:0]  data_out;
 reg [DWIDTH-1:0]  data_buffer;
 wire              ren;
 wire              wen;
-wire [AWIDTH-1:0]   mem_rdptr;          // the actual memory read pointer
+wire [AWIDTH-1:0] mem_rdptr;          // the actual memory read pointer
 
 //========================
 // FIFO control logic
@@ -86,13 +84,12 @@ assign wen = !full & write;
 assign ren = !empty & read;
 
 // for the FWFT FIFO, data_buffer hold the current data on top so read the next location in the memory
-assign mem_rdptr = rdptr[AWIDTH-1:0] + 1;
+assign mem_rdptr = rdptr[AWIDTH-1:0] + 1'b1;
 
 always @(posedge clk)
 begin
     if (ren) data_out <= mem[mem_rdptr];
     if (wen) mem[wtptr[AWIDTH-1:0]] <= din;
 end
-
 
 endmodule
