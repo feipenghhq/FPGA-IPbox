@@ -26,7 +26,8 @@ VERILATOR	= verilator
 # =============================
 OUT_DIR		  = output
 
-ALL_SRC_FILES = $(shell find $(RTL_PATH) -type f)
+ALL_SRC_FILES = $(shell find $(RTL_PATH) -name "*.v" -type f)
+ALL_TB_FILES  = $(shell find $(TB_PATH) -name "*.v" -type f)
 RTL_OUT		  = $(OUT_DIR)/$(TOP_DESIGN)
 TB_OUT		  = $(OUT_DIR)/$(TOP_DESIGN)_tb
 
@@ -58,7 +59,7 @@ run: $(TB_OUT)
 
 tb: $(TB_OUT)
 
-$(TB_OUT): $(TB_TOP) $(TOP_FILE) $(ALL_SRC_FILES) $(OUT_DIR)
+$(TB_OUT): $(TB_TOP) $(TOP_FILE) $(ALL_SRC_FILES) $(ALL_TB_FILES) $(OUT_DIR)
 	$(IVERILOG) -o $(TB_OUT) $(TB_TOP) -y $(RTL_PATH) -y $(TB_PATH)
 
 rtl: $(OUT_DIR) $(RTL_OUT)

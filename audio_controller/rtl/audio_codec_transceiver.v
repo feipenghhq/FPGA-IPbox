@@ -19,8 +19,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 module audio_codec_transceiver #(
-parameter SYSCLK = 50000,       // System clock rate in KHz
-parameter MCLK   = 12288,       // MCLK clock rate in KHz
+parameter SYSCLK = 50,          // System clock rate in MHz
+parameter MCLK   = 12.5,        // MCLK clock rate in MHz round 12.288 to 12.5
 parameter WIDTH  = 32           // L + R channel: 16 + 16 => 32
 ) (
 
@@ -44,27 +44,38 @@ input                   adcdat
 // ================================================
 // Parameter
 // ================================================
-localparam MCLK_CNT       = 50000 * 1000 / 12288; // clock counter to generate the MCLK
+
+localparam SAMPLE_RATE    = 0.048;          // 48K sample rate
+localparam BCLK           = WIDTH * SAMPLE_RATE;    // bclk freqeuncy
+/* verilator lint_off REALCVT */
+localparam BCLK_CNT       = rtoi(SYSCLK / BCLK);
+localparam MCLK_CNT       = rtoi(SYSCLK / MCLK); // clock counter to generate the MCLK
+/* verilator lint_on REALCVT */
 localparam MCLK_CNT_WIDTH = $clog2(MCLK_CNT+1);
-localparam LRC_CNT_WIDTH  = $clog2(WIDTH);
+localparam BCLK_CNT_WIDTH = $clog2(BCLK_CNT+1);
+localparam LRC_CNT_WIDTH  = $clog2(WIDTH+1);
+
+initial $display("MCLK_CNT = %d", MCLK_CNT);
 
 // ================================================
 // Signal
 // ================================================
-reg [MCLK_CNT_WIDTH-1:0]    mclk_counter;   // clock counter
+reg [MCLK_CNT_WIDTH-1:0]    mclk_counter;   // MCLK clock counter
 wire                        mclk_posedge;
 wire                        mclk_negedge;
-wire                        mclk_toggle;
+reg [BCLK_CNT_WIDTH-1:0]    bclk_counter;   // BCLK clock counter
+wire                        bclk_posedge;
+wire                        bclk_negedge;
 reg [LRC_CNT_WIDTH-1:0]     lrc_counter;   // right/left clock counter
 wire                        lrc_posedge;
 wire                        lrc_negedge;
-wire                        lrc_toggle;
 
 reg [WIDTH-1:0]     dacdat_q;
 reg [WIDTH-1:0]     adcdat_q;
 reg                 mclk_q;
+reg                 bclk_q;
 reg                 lrc_q;
-reg                 adcdat_vld_q;
+reg                 one_xfer_done;
 reg                 dacdat_req_q;
 reg                 dacdat_req_q_s1;
 wire                adcdat_sysclk;    // synced adcdat input
@@ -72,12 +83,12 @@ wire                adcdat_sysclk;    // synced adcdat input
 // ================================================
 // Assign output to internal register
 // ================================================
-assign bclk = mclk_q;
+assign bclk = bclk_q;
 assign mclk = mclk_q;
 assign daclrc = lrc_q;
 assign dacdat = dacdat_q[WIDTH-1];
 assign adclrc = lrc_q;
-assign adcdat_vld = adcdat_vld_q;
+assign adcdat_vld = one_xfer_done;
 assign adcdat_out = adcdat_q;
 assign dacdat_req = dacdat_req_q;
 
@@ -86,22 +97,39 @@ assign dacdat_req = dacdat_req_q;
 // ================================================
 // BCLK/MCLK starts from reset
 //               ___     ___
-// MCLK  _______/   \___/   \___
+//  CLK  _______/   \___/   \___
 //       ___
-// RST      \___________________
+//  RST     \___________________
 //
+
+// MCLK
 always @(posedge clk) begin
     if (rst || mclk_negedge) mclk_counter <= 'b0;
     else                     mclk_counter <= mclk_counter + 1'b1;
 end
 
-assign mclk_posedge = (mclk_counter == MCLK_CNT[MCLK_CNT_WIDTH-1:0] / 2);
-assign mclk_negedge = (mclk_counter == MCLK_CNT[MCLK_CNT_WIDTH-1:0]);
-assign mclk_toggle = mclk_negedge | mclk_posedge;
+assign mclk_posedge = (mclk_counter == MCLK_CNT[MCLK_CNT_WIDTH-1:0] / 2 - 1);
+assign mclk_negedge = (mclk_counter == MCLK_CNT[MCLK_CNT_WIDTH-1:0] - 1);
 
 always @(posedge clk) begin
     if      (rst)         mclk_q <= 1'b0;
-    else if (mclk_toggle) mclk_q <= ~mclk_q;
+    else if (mclk_posedge) mclk_q <= 1'b1;
+    else if (mclk_negedge) mclk_q <= 1'b0;
+end
+
+// BCLK
+always @(posedge clk) begin
+    if (rst || bclk_negedge) bclk_counter <= 'b0;
+    else                     bclk_counter <= bclk_counter + 1'b1;
+end
+
+assign bclk_posedge = (bclk_counter == BCLK_CNT[BCLK_CNT_WIDTH-1:0] / 2 - 1);
+assign bclk_negedge = (bclk_counter == BCLK_CNT[BCLK_CNT_WIDTH-1:0] - 1);
+
+always @(posedge clk) begin
+    if      (rst)         bclk_q <= 1'b0;
+    else if (bclk_posedge) bclk_q <= 1'b1;
+    else if (bclk_negedge) bclk_q <= 1'b0;
 end
 
 // lrc clock
@@ -114,19 +142,19 @@ end
 //
 always @(posedge clk) begin
     if (rst) lrc_counter <= 'b0;
-    else if (mclk_negedge) begin
+    else if (bclk_negedge) begin
         if (lrc_posedge) lrc_counter <= 'b0;
         else             lrc_counter <= lrc_counter + 1'b1;
     end
 end
 
-assign lrc_negedge = mclk_negedge & (lrc_counter == (WIDTH[LRC_CNT_WIDTH-1:0] / 2 - 1));
-assign lrc_posedge = mclk_negedge & (lrc_counter == (WIDTH[LRC_CNT_WIDTH-1:0] - 1));
-assign lrc_toggle  = lrc_posedge | lrc_negedge;
+assign lrc_negedge = bclk_negedge & (lrc_counter == (WIDTH / 2 - 1));
+assign lrc_posedge = bclk_negedge & (lrc_counter == (WIDTH - 1));
 
 always @(posedge clk) begin
     if      (rst)        lrc_q <= 1'b1;
-    else if (lrc_toggle) lrc_q <= ~lrc_q;
+    else if (lrc_posedge) lrc_q <= 1'b1;
+    else if (lrc_negedge) lrc_q <= 1'b0;
 end
 
 // ================================================
@@ -136,16 +164,28 @@ end
 dsync adcdat_dsync (.Q(adcdat_sysclk), .D(adcdat), .clk(clk), .rst(rst));
 
 always @(posedge clk) begin
+    one_xfer_done <= lrc_posedge;
     // ADC DATA
-    if (mclk_posedge) adcdat_q <= {adcdat_q[WIDTH-2:0] , adcdat_sysclk};
-    adcdat_vld_q <= lrc_posedge;
+    //if (adcdat_vld) adcdat_q <= 'b0;
+    //else if (bclk_posedge) adcdat_q <= {adcdat_q[WIDTH-2:0] , adcdat_sysclk};
+    if (bclk_posedge) adcdat_q <= {adcdat_q[WIDTH-2:0] , adcdat_sysclk};
 
-    // DAC DATA
-    dacdat_req_q <= lrc_posedge;
+    // ADC DATA
+    // ask for the ne dac data 2  cycles before we change to LCR clock. Why 2 cycles?
+    // request goes out => 1 clock (req is flopped here)
+    // data come in and get flopped =>1 clock
+    dacdat_req_q <= (lrc_counter == (WIDTH - 1)) & (bclk_counter == BCLK_CNT[BCLK_CNT_WIDTH-1:0] - 3) ;
     dacdat_req_q_s1 <= dacdat_req_q;
     if (dacdat_req_q_s1) dacdat_q <= dacdat_in; // data comes the next cycle after dacdat_req
-    else if (mclk_negedge) dacdat_q <= dacdat_q << 1;
+    else if (bclk_negedge) dacdat_q <= dacdat_q << 1;
 end
+
+function integer rtoi;
+    input integer x;
+    begin
+        rtoi = x;
+    end
+endfunction
 
 endmodule
 

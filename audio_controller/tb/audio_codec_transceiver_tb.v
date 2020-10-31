@@ -16,7 +16,7 @@
 
 module audio_codec_transceiver_tb();
 
-parameter CLK_FREQ = 50;       // System clock rate in KHz
+parameter CLK_RPED = 20;
 parameter WIDTH  = 32;          // L + R channel: 16 + 16 => 32
 
 parameter DELTA  = 2;   // need to be greater then the DELTA defined in codec_transceiver_bfm
@@ -121,7 +121,7 @@ initial
 begin
     clk = 1;
     forever begin
-        #(CLK_FREQ/2) clk = ~clk;
+        #(CLK_RPED/2) clk = ~clk;
     end
 end
 

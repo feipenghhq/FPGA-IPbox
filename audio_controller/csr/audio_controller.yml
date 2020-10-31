@@ -51,8 +51,14 @@ register:
       note: '32-bit audio data to DAC'
 
   i2c_ctrl:
+    i2c_id:
+      size: 7
+      reset: 0x0
+      swtype: W
+      hwtype: R
+      note: 'I2C slave ID'
     data:
-      size: 24
+      size: 16
       reset: 0x0
       swtype: W
       hwtype: R

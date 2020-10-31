@@ -29,8 +29,11 @@ input  [31:0]   sw_wrdata,
 output [31:0]   sw_rddata,
 
 // I2C signal
-inout           i2c_SCL,
-inout           i2c_SDA,
+input           i2c_SDA_i,
+output          i2c_SDA_w,
+output          i2c_SDA_o,
+output          i2c_SCL_w,
+output          i2c_SCL_o,
 
 // Audio Codec interface
 output          bclk,
@@ -53,8 +56,8 @@ output          adc_fifo_empty
 // ================================================
 // Parameter
 // ================================================
-parameter DAC_FROM_CPU = 0;
-parameter ADC_FROM_CPU = 0;
+localparam DAC_FROM_CPU = 0;
+localparam ADC_FROM_CPU = 0;
 
 // ================================================
 // Signal
@@ -66,7 +69,8 @@ wire            hw_status_dac_fifo_full;
 wire            hw_status_adc_fifo_empty;
 wire            hw_ctrl_dac_sel;
 wire            hw_ctrl_adc_sel;
-wire [23:0]     hw_i2c_ctrl_data;
+wire [15:0]     hw_i2c_ctrl_data;
+wire [6:0]      hw_i2c_ctrl_i2c_id;
 wire            hw_i2c_ctrl_write;
 wire            hw_adc_data_data_fifo_read;
 wire [31:0]     hw_adc_data_data_fifo_read_data;
@@ -80,7 +84,6 @@ wire            hw_i2c_ctrl_write_posedge;
 wire [6:0]      i2c_slave_addr;
 wire [15:0]     i2c_writedata;
 wire            i2c_ready;
-wire            i2c_wen;
 
 // DAC FIFO related signal
 wire            dac_fifo_read;
@@ -112,9 +115,8 @@ end
 assign hw_i2c_ctrl_write_posedge = hw_i2c_ctrl_write & ~hw_i2c_ctrl_write_s1;
 
 // Wire connection - I2C
-assign i2c_slave_addr = hw_i2c_ctrl_data[6:0];
-assign i2c_wen        = hw_i2c_ctrl_data[7] & hw_i2c_ctrl_write_posedge;
-assign i2c_writedata  = hw_i2c_ctrl_data[23:8];
+assign i2c_slave_addr = hw_i2c_ctrl_i2c_id;
+assign i2c_writedata  = hw_i2c_ctrl_data;
 assign hw_status_i2c_idle = i2c_ready;
 
 // Wire connection - DAC FIFO
@@ -161,6 +163,7 @@ audio_controller_csr audio_controller_csr
     .o_hw_ctrl_dac_sel          (hw_ctrl_dac_sel),
     .o_hw_ctrl_adc_sel          (hw_ctrl_adc_sel),
     .o_hw_i2c_ctrl_data         (hw_i2c_ctrl_data),
+    .o_hw_i2c_ctrl_i2c_id       (hw_i2c_ctrl_i2c_id),
     .o_hw_i2c_ctrl_write        (hw_i2c_ctrl_write),
     .o_hw_adc_data_data_fifo_read      (hw_adc_data_data_fifo_read),
     .i_hw_adc_data_data_fifo_read_data (hw_adc_data_data_fifo_read_data),
@@ -175,12 +178,15 @@ i2c_master (
     .clk                    (clk),
     .rst                    (rst),
     .req                    (hw_i2c_ctrl_write_posedge),
-    .wen                    (i2c_wen),
+    .wen                    (hw_i2c_ctrl_write_posedge),
     .slave_addr             (i2c_slave_addr),
     .writedata              (i2c_writedata),
     .ready                  (i2c_ready),
-    .i2c_SCL                (i2c_SCL),
-    .i2c_SDA                (i2c_SDA),
+    .i2c_SDA_i              (i2c_SDA_i),
+    .i2c_SDA_w              (i2c_SDA_w),
+    .i2c_SDA_o              (i2c_SDA_o),
+    .i2c_SCL_w              (i2c_SCL_w),
+    .i2c_SCL_o              (i2c_SCL_o),
     // verilator lint_off PINCONNECTEMPTY
     .i2c_slave_addr_err     (),
     .i2c_slave_noack_err    ()
@@ -188,7 +194,7 @@ i2c_master (
 );
 
 // DAC FIFO
-fifo #(.DWIDTH(32),.AWIDTH(3)) dac_fifo
+fifo #(.DWIDTH(32), .DEPTH(4)) dac_fifo
 (
     .rst    (rst),
     .clk    (clk),
@@ -204,7 +210,7 @@ fifo #(.DWIDTH(32),.AWIDTH(3)) dac_fifo
 
 
 // ADC FIFO
-fwft_fifo #(.DWIDTH(32),.AWIDTH(3)) adc_fifo
+fwft_fifo #(.DWIDTH(32), .DEPTH(4)) adc_fifo
 (
     .rst    (rst),
     .clk    (clk),
@@ -220,7 +226,7 @@ fwft_fifo #(.DWIDTH(32),.AWIDTH(3)) adc_fifo
 
 
 // Audio Codec transceiver
-audio_codec_transceiver #(.SYSCLK(SYSCLK*1000))
+audio_codec_transceiver #(.SYSCLK(SYSCLK))
 audio_codec_transceiver
 (
     .clk            (clk),
