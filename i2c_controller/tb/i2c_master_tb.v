@@ -15,8 +15,7 @@
 
 module i2c_master_tb();
 
-parameter       CLK_FREQ = 50;
-parameter       I2C_CLK_FREQ = 100;
+parameter       CLK_RPED = 20;
 parameter       NUM_BYTE = 4;
 parameter       BYTE_SIZE = 8;
 parameter       DATA_WIDTH = NUM_BYTE * BYTE_SIZE;
@@ -30,11 +29,14 @@ reg                           req;
 reg                           wen;
 reg  [BYTE_SIZE-2:0]          slave_addr;
 reg  [DATA_WIDTH-1:0]         writedata;
-//wire  [DATA_WIDTH-1:0]     readdata;
-//wire                       rdata_vld;
 wire                          ready;
 wire                          i2c_slave_addr_err;
 wire                          i2c_slave_noack_err;
+wire                          i2c_SDA_i;
+wire                          i2c_SDA_w;
+wire                          i2c_SDA_o;
+wire                          i2c_SCL_w;
+wire                          i2c_SCL_o;
 // ================================================
 // I2C BFM Signal
 // ================================================
@@ -47,8 +49,10 @@ wire [BYTE_SIZE-1:0] r_byte2;
 wire [BYTE_SIZE-1:0] r_byte3;
 wire                 complete;
 wire  [DATA_WIDTH-1:0] bfm_writedata;
-wire SDA;
-wire SCL;
+
+tri SDA;
+tri SCL;
+
 
 parameter DELTA = 2;
 
@@ -59,8 +63,6 @@ reg error;
 // ================================================
 // DUT
 i2c_master dut_i2c_master(
-    .i2c_SCL(SCL),
-    .i2c_SDA(SDA),
     .*
 );
 
@@ -72,6 +74,9 @@ i2c_slave_bfm i2c_slave_bfm(
 );
 
 assign bfm_writedata = {r_byte3, r_byte2, r_byte1, r_byte0};
+assign SDA = i2c_SDA_w ? i2c_SDA_o : 1'bz;
+assign SCL = i2c_SCL_w ? i2c_SCL_o : 1'bz;
+assign i2c_SDA_i = SDA;
 
 pullup(SDA);
 pullup(SCL);
@@ -88,10 +93,12 @@ begin
     #100 @(posedge clk);
     #1   rst = 1'b0;
     #1000 @(posedge clk);
-    I2C_write(1'b1, 7'b1010101, 32'hdeadbeef);
-    I2C_write(1'b1, 7'b1110000, 32'habcdabcd);
-    #1000;
-    I2C_write(1'b1, 7'b1100110, 32'h11111111);
+    I2C_write(1'b1, 7'b0011010, 32'hdeadbeef);
+    wait(ready);
+    I2C_write(1'b1, 7'b0011010, 32'habcdabcd);
+    wait(ready);
+    I2C_write(1'b1, 7'b0011010, 32'h11111111);
+    wait(ready);
     #100 @(posedge clk);
     $display("Finished the test at %t", $time);
     print_result();
@@ -105,7 +112,7 @@ initial
 begin
     clk = 1;
     forever begin
-        #(CLK_FREQ/2) clk = ~clk;
+        #(CLK_RPED/2) clk = ~clk;
     end
 end
 

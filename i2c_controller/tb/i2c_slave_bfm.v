@@ -33,38 +33,40 @@ assign i2c_SDA_i = i2c_SDA;
 assign r_addr = addr_access[BYTE_SIZE-1:1];
 assign r_access = addr_access[0];
 
-always
+initial
 begin
-    i2c_SDA_w = 1'b0;
-    complete = 1'b0;
-    // Start condition
-    wait(i2c_SCL == 1'b1);
-    //wait(i2c_SDA == 1'b0);
-    @(negedge i2c_SDA);
-    #DELTA $display("[I2C BFM] SDA goes low. Start transaction at time %t", $time);
-    // get the address
-    receive_byte(addr_access);
-    #DELTA $display("[I2C BFM] Received address: 0x%h at time %t", r_addr, $time);
-    send_ack();
-    // receive the next four byte
-    receive_byte(r_byte3);
-    #DELTA $display("[I2C BFM] Received byte3: 0x%h at time %t", r_byte3, $time);
-    send_ack();
-    receive_byte(r_byte2);
-    #DELTA $display("[I2C BFM] Received byte2: 0x%h at time %t", r_byte2, $time);
-    send_ack();
-    receive_byte(r_byte1);
-    #DELTA $display("[I2C BFM] Received byte1: 0x%h at time %t", r_byte1, $time);
-    send_ack();
-    receive_byte(r_byte0);
-    send_ack();
-    #DELTA $display("[I2C BFM] Received byte0: 0x%h at time %t", r_byte0, $time);
-    wait(i2c_SCL == 1'b1);
-    #DELTA $display("[I2C BFM] SCL goes high at time %t", $time);
-    @(posedge i2c_SDA_i);
-    #DELTA $display("[I2C BFM] SDA goes high at time %t", $time);
-    complete = 1'b1;
-    #DELTA $display("[I2C BFM] Transaction completed %t", $time);
+    forever begin
+        i2c_SDA_w = 1'b0;
+        complete = 1'b0;
+        // Start condition
+        wait(i2c_SCL == 1'b1);
+        //wait(i2c_SDA == 1'b0);
+        @(negedge i2c_SDA);
+        #DELTA $display("[I2C BFM] SDA goes low. Start transaction at time %t", $time);
+        // get the address
+        receive_byte(addr_access);
+        #DELTA $display("[I2C BFM] Received address: 0x%h at time %t", r_addr, $time);
+        send_ack();
+        // receive the next four byte
+        receive_byte(r_byte3);
+        #DELTA $display("[I2C BFM] Received byte3: 0x%h at time %t", r_byte3, $time);
+        send_ack();
+        receive_byte(r_byte2);
+        #DELTA $display("[I2C BFM] Received byte2: 0x%h at time %t", r_byte2, $time);
+        send_ack();
+        receive_byte(r_byte1);
+        #DELTA $display("[I2C BFM] Received byte1: 0x%h at time %t", r_byte1, $time);
+        send_ack();
+        receive_byte(r_byte0);
+        send_ack();
+        #DELTA $display("[I2C BFM] Received byte0: 0x%h at time %t", r_byte0, $time);
+        wait(i2c_SCL == 1'b1);
+        #DELTA $display("[I2C BFM] SCL goes high at time %t", $time);
+        @(posedge i2c_SDA_i);
+        #DELTA $display("[I2C BFM] SDA goes high at time %t", $time);
+        complete = 1'b1;
+        #DELTA $display("[I2C BFM] Transaction completed %t", $time);
+    end
 end
 
 // ================================================

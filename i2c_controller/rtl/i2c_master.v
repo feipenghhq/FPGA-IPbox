@@ -36,8 +36,11 @@ input  [DATA_WIDTH-1:0]         writedata,  // byte0, byte1, byte2, ...
 output                          ready,
 
 // I2C signal
-inout                           i2c_SCL,
-inout                           i2c_SDA,
+input                           i2c_SDA_i,
+output                          i2c_SDA_w,
+output                          i2c_SDA_o,
+output                          i2c_SCL_w,
+output                          i2c_SCL_o,
 
 // error
 output                          i2c_slave_addr_err,    // slave address is not acked.
@@ -83,12 +86,11 @@ localparam ACK_PHASE = BYTE_SIZE;
 // ================================================
 
 // I2C signal
-wire i2c_SDA_i;
 wire i2c_SDA_i_sysclk;
-reg  i2c_SDA_w;
-reg  i2c_SDA_o;
-reg  i2c_SCL_w;
-reg  i2c_SCL_o;
+reg  i2c_SDA_w_q;
+reg  i2c_SDA_o_q;
+reg  i2c_SCL_w_q;
+reg  i2c_SCL_o_q;
 reg  i2c_SDA_w_next;
 reg  i2c_SDA_o_next;
 reg  i2c_SCL_w_next;
@@ -120,13 +122,13 @@ reg [BYTE_SIZE:0]           i2c_byte_state;
 reg [I2C_STATE_SIZE-1:0]    i2c_state_next;
 reg [BYTE_SIZE:0]           i2c_byte_state_next;
 
-
 // ================================================
-// INOUT port connection
+// I2C signal
 // ================================================
-assign i2c_SCL   = i2c_SCL_w ? i2c_SCL_o : 1'bz;
-assign i2c_SDA   = i2c_SDA_w ? i2c_SDA_o : 1'bz;
-assign i2c_SDA_i = i2c_SDA;
+assign  i2c_SDA_w = i2c_SDA_w_q;
+assign  i2c_SDA_o = i2c_SDA_o_q;
+assign  i2c_SCL_w = i2c_SCL_w_q;
+assign  i2c_SCL_o = i2c_SCL_o_q;
 
 // ================================================
 // double sync flow to sync the input SDA signal
@@ -148,8 +150,8 @@ end
 // ================================================
 // I2C clock edge
 // ================================================
-assign i2c_clk_negedge = (clk_divider == SYSCLK_COUNT[$clog2(SYSCLK_COUNT)-1:0] / 2);
-assign i2c_clk_posedge = (clk_divider == SYSCLK_COUNT[$clog2(SYSCLK_COUNT)-1:0]);
+assign i2c_clk_negedge = (clk_divider == SYSCLK_COUNT[$clog2(SYSCLK_COUNT)-1:0] / 2 - 1);
+assign i2c_clk_posedge = (clk_divider == SYSCLK_COUNT[$clog2(SYSCLK_COUNT)-1:0] - 1);
 assign i2c_clk_toggle = i2c_clk_posedge | i2c_clk_negedge;
 
 // ================================================
@@ -219,8 +221,8 @@ end
 // ================================================
 
 always @(*) begin
-    i2c_SCL_o_next = i2c_SCL_o;
-    i2c_SCL_w_next = i2c_SCL_w;
+    i2c_SCL_o_next = i2c_SCL_o_q;
+    i2c_SCL_w_next = i2c_SCL_w_q;
     if (i2c_state[I2C_IDLE]) begin
         i2c_SCL_o_next = 1'b1;
         i2c_SCL_w_next = 1'b0;
@@ -237,12 +239,12 @@ end
 
 always @(posedge clk) begin
     if (rst) begin
-        i2c_SCL_o <= 1'b1;
-        i2c_SCL_w <= 1'b0;
+        i2c_SCL_o_q <= 1'b1;
+        i2c_SCL_w_q <= 1'b0;
     end
     else begin
-        i2c_SCL_o <= i2c_SCL_o_next;
-        i2c_SCL_w <= i2c_SCL_w_next;
+        i2c_SCL_o_q <= i2c_SCL_o_next;
+        i2c_SCL_w_q <= i2c_SCL_w_next;
     end
 end
 
@@ -250,8 +252,8 @@ end
 // i2c data (SDA) generation
 // ================================================
 always @(*) begin
-    i2c_SDA_o_next = i2c_SDA_o;
-    i2c_SDA_w_next = i2c_SDA_w;
+    i2c_SDA_o_next = i2c_SDA_o_q;
+    i2c_SDA_w_next = i2c_SDA_w_q;
     if (i2c_state[I2C_IDLE]) begin  // start condition
         if (start) begin
             i2c_SDA_w_next = 1'b1;
@@ -280,18 +282,19 @@ end
 
 always @(posedge clk) begin
     if (rst) begin
-        i2c_SDA_o <= 1'b1;
-        i2c_SDA_w <= 1'b0;
+        i2c_SDA_o_q <= 1'b1;
+        i2c_SDA_w_q <= 1'b0;
     end
     else begin
-        i2c_SDA_o <= i2c_SDA_o_next;
-        i2c_SDA_w <= i2c_SDA_w_next;
+        i2c_SDA_o_q <= i2c_SDA_o_next;
+        i2c_SDA_w_q <= i2c_SDA_w_next;
     end
 end
 
-// shift data during I2C_DATA state at I2C clock negedge. but do not shift when to goes to
-// the ACK phase
-assign shift_data = i2c_clk_negedge & ~i2c_byte_state[ACK_PHASE-1];
+// Shift data at SCL posedge and update SDA signal at SCL negedge.
+// SDA will get the new data from the interal register
+// But do not shift when we are in ACK phase
+assign shift_data = i2c_clk_posedge & (i2c_state[I2C_ADDR] | i2c_state[I2C_DATA]) & ~i2c_byte_state[ACK_PHASE-1];
 
 always @(*) begin
     write_data_next = write_data;
