@@ -1,5 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+// Copyright 2020 by Heqing Huang (feipenghhq@gamil.com)
+//
 // Project Name: Uart
 // Module Name: uart_rx
 //
@@ -81,7 +83,7 @@ always_ff @(posedge clk) begin
         if (buad_count == SAMPLE_COUNT) begin
             sample <= 1'b1;
             buad_count  <= 'b0;
-        end 
+        end
         else begin
             sample <= 1'b0;
             buad_count  <= buad_count + 1;
@@ -92,10 +94,10 @@ end
 //=================================
 // Uart TX logic
 //=================================
-// Phase: Start, DATA, PARITY, STOP. 
-// We should sample in the middle of each serial bit. 
-// In order to sample in te middle, we first sample half of the sample which 
-// give us the middle of the start bit. Then we sample all the sample pulse 
+// Phase: Start, DATA, PARITY, STOP.
+// We should sample in the middle of each serial bit.
+// In order to sample in te middle, we first sample half of the sample which
+// give us the middle of the start bit. Then we sample all the sample pulse
 // which will be the middle of the next serial bit.
 
 // synchronize the input bit
@@ -131,13 +133,13 @@ always_ff @(posedge clk) begin
                 rx_state <= STOP;
         end
         STOP: begin
-            if (sample_cnt == stop_cnt_static) 
+            if (sample_cnt == stop_cnt_static)
                 rx_state <= IDLE;
         end
         endcase
     end
 end
-                
+
 always_ff @(posedge clk) begin
     if(rst) begin
         data_cnt    <= 'b0;

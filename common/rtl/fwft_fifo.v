@@ -1,10 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+// Copyright 2020 by Heqing Huang (feipenghhq@gamil.com)
+//
 // Project Name: N/A
 // Module Name: fwft_fifo
 //
 // Author: Heqing Huang
-// Date Created: 05/06/2019
+// Date Created: 10/28/2020
 //
 // ================== Description ==================
 //

@@ -1,5 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+// Copyright 2020 by Heqing Huang (feipenghhq@gamil.com)
+//
 // Project Name: Uart
 // Module Name: uart_core
 //
@@ -26,10 +28,10 @@ parameter CLKFRQ   = 100          // clock frequence in Mhz
 ) (
 input           clk,
 input           rst,
-// cfg 
+// cfg
 input [1:0]     cfg_parity,
 input [1:0]     cfg_stop_bits,
-// tx path 
+// tx path
 input [7:0]     txdin,
 input           txvalid,
 output          ready,

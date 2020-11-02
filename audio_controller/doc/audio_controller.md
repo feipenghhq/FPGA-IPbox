@@ -1,36 +1,33 @@
 # Audio Controller
 
-[TOC]
+- [Audio Controller](#audio-controller)
+  - [Version](#version)
+  - [Supported Feature](#supported-feature)
+  - [Design Specification](#design-specification)
+  - [Register Space](#register-space)
+  - [Change Log](#change-log)
+  - [Reference](#reference)
+  - [WM8731/WM8731L Chip Introduction](#wm8731wm8731l-chip-introduction)
 
-An audio controller for WM8731/WM8731L chip in DE2/DE1 FPGA board. 
-
-> The architecture of this design is based on the book: *Embedded SoPC Design With NIOS II Processor and Verilog Example* by Pong Chu
-
-
+An audio controller for WM8731/WM8731L chip in DE2/DE1 FPGA board.
 
 ## Version
 
 Ver 1.0
 
-
-
 ## Supported Feature
 
 1. Left-justified mode
 2. Slave clocking mode (BCLK driven by FPGA)
-3. Master clock rate of 12.288Mhz
+3. Master clock rate of 12.288 MHz (rounded to 12.5 MHz in FPGA)
 4. Resolution of 16 bits
 5. Sampling rate of 48K samples per second
-
-
 
 ## Design Specification
 
 <img src="assets/img/rtl_block.png" style="zoom:67%;" />
 
-
-
-The Audio controller has 5 main module: I2C controller, Codec data transceiver, DAC FIFO, ADC FIFO, CSR module
+The Audio controller has 5 main module: I2C controller, Codec data transceiver, DAC FIFO, ADC FIFO, CSR module.
 
 ### I2C Controller
 
@@ -46,9 +43,7 @@ The FIFO act as buffer between the downstream/upstream logic from FPGA/CPU and t
 
 ### CSR module
 
-Configuration and status register module. Provides configuration and status report for the CPU.
-
-
+Configuration and status register module. Provides configuration for HW logic and status report for the CPU.
 
 ## Register Space
 
@@ -56,7 +51,20 @@ The audio controller implements the following register space:
 
 [Audio Controller Register Map](./../csr/audio_controller_csr/doc/audio_controller_csr.html)
 
+## Change Log
 
+- 10/30/2020: Version 1.0 - Initial Version Completed. Tested the design in FPGA.
+- 10/27/2020: Version 1.0 - Initial Version Started.
+
+## Reference
+
+- *Embedded SoPC Design With NIOS II Processor and Verilog Example* by Pong Chu.
+  - The architecture of the hardware design is base on the book.
+  - Most of the nios-ii c driver code are from the book.
+  
+- WM8731/WM8731L Datasheet.
+
+----
 
 ## WM8731/WM8731L Chip Introduction
 
@@ -97,8 +105,6 @@ The digital audio interface also receives the digital audio data for the interna
 #### Left Justified Mode Timing Diagram
 
 <img src="assets/img/left_justified.png" style="zoom:67%;" />
-
-
 
 #### Digital Audio Interface Slave Mode
 

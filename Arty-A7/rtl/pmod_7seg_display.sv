@@ -1,5 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+// Copyright 2020 by Heqing Huang (feipenghhq@gamil.com)
+//
 // Project Name: Arty A7
 // Module Name: pmod_7seg_display
 //
@@ -7,10 +9,10 @@
 // Date Created: 05/06/2019
 //
 // ================== Description ==================
-//      
+//
 //  7 segment display logic for the PMOD module.
 //
-//  Because the PMOD use the same ctrl pins for the two numbers, it 
+//  Because the PMOD use the same ctrl pins for the two numbers, it
 //  uses additional select bit to do time multiplexing between the two
 //  display numbers.
 //
@@ -28,7 +30,7 @@ output reg [6:0]    out,            // 6 - 0: ABCDEFG
 output reg          select
 );
 
-localparam SWITCH_CYCLE =  CLK_FREQ * BOUNCE_TIME;    
+localparam SWITCH_CYCLE =  CLK_FREQ * BOUNCE_TIME;
 
 reg [15:0]  counter;
 
@@ -78,7 +80,7 @@ endmodule // seven_display
 
 
 /* Backup information - Value Decode
- * upper case means the light is on, 
+ * upper case means the light is on,
 INPUT VALUT	SEGMENTS LIT	OUTPUT VALUE
 0	        A B C D E F	    7'b1111110
 1	        B C	            7'b0110000

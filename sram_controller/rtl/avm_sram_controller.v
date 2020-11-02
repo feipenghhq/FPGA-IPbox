@@ -1,5 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+// Copyright 2020 by Heqing Huang (feipenghhq@gamil.com)
+//
 // Project Name: N/A
 // Module Name: avm_sram_controller
 //
@@ -112,7 +114,7 @@ module avm_sram_controller
                 avm_writedata_dw1   <= avm_writedata[31:16];
                 avm_byteenable_dw1  <= avm_byteenable[3:2];
                 // the SRAM is arranged as 256K x 16b so the LSb from avm_address is not used
-                avm_address_dw1     <= avm_address[18:1] | 17'h1;                
+                avm_address_dw1     <= avm_address[18:1] | 17'h1;
             end
             S_DW0:begin // DW1 is availabe at the end of S_CAPTURE state
                 avm_readdata[15:0]  <= sram_readdata;
@@ -143,10 +145,10 @@ module avm_sram_controller
                     sram_oe_n   <= ~avm_read;
                     sram_we_n   <= ~avm_write;
                     sram_ub_n   <= ~avm_byteenable[1];
-                    sram_lb_n   <= ~avm_byteenable[0]; 
+                    sram_lb_n   <= ~avm_byteenable[0];
                     sram_writedata  <= avm_writedata[15:0];
                     // Note: the SRAM is arranged as 256K x 16b so the LSb from avm_address is not used
-                    sram_addr   <= avm_address[18:1];                      
+                    sram_addr   <= avm_address[18:1];
                 end
                 S_DW0:begin
                     sram_ub_n   <= ~avm_byteenable_dw1[1];

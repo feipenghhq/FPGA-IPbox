@@ -1,6 +1,11 @@
 # Avalon Mapped SRAM Controller
 
-[TOC]
+- [Avalon Mapped SRAM Controller](#avalon-mapped-sram-controller)
+  - [Introduction](#introduction)
+  - [Version](#version)
+  - [Specification](#specification)
+  - [Timing Diagram](#timing-diagram)
+  - [Change Log](#change-log)
 
 ## Introduction
 
@@ -8,13 +13,9 @@ The Avalon Memory SRAM controller IP is designed for the SRAM chip Terasic DE1/D
 
 The SRAM chip used in the DE1/DE2 FPGA board is **IS61LV25616** from ISSI.
 
-
-
 ## Version
 
 Ver 2.0
-
-
 
 ## Specification
 
@@ -28,27 +29,17 @@ Ver 2.0
 
 5. The output address to SRAM in the word address and each work is 16 bits. (The size of the SRAM) 
 
-    
-
 ## Timing Diagram
 
 ### Simple Read operation
 
-
-
 ![read operation](assets/img/read.png)
-
-
 
 ### Simple Write operation
 
-
-
 ![write operation](assets/img/write.png)
 
-
-
-## Chang Log
+## Change Log
 
 - 10/10/2020: Revision 2.0
 

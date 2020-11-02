@@ -1,4 +1,7 @@
 # =================================================================
+#
+# Copyright 2020 by Heqing Huang (feipenghhq@gamil.com)
+#
 # Makefile for running iverilog flow
 # Author: Heqing Huang
 # Date Created: 10/10/2020

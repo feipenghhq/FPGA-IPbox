@@ -1,5 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+// Copyright 2020 by Heqing Huang (feipenghhq@gamil.com)
+//
 // Project Name: N/A
 // Module Name: dsync
 //
@@ -15,7 +17,7 @@
 module dsync #(
 parameter STAGE = 2
 ) (
-output  Q,    
+output  Q,
 input   D,
 input   clk,
 input   rst

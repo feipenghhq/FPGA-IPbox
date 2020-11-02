@@ -1,5 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+// Copyright 2020 by Heqing Huang (feipenghhq@gamil.com)
+//
 // Project Name: Uart
 // Module Name: uart_tx
 //
@@ -81,7 +83,7 @@ always_ff @(posedge clk) begin
         if (buad_count == SAMPLE_COUNT) begin
             sample <= 1'b1;
             buad_count  <= 'b0;
-        end 
+        end
         else begin
             sample <= 1'b0;
             buad_count  <= buad_count + 1;
@@ -92,8 +94,8 @@ end
 //=================================
 // Uart TX logic
 //=================================
-// Phase: Start, DATA, PARITY, STOP. 
-// The time of each phase is controled by the number of sample. 
+// Phase: Start, DATA, PARITY, STOP.
+// The time of each phase is controled by the number of sample.
 // 16 sample means the current phase is over and we can
 // move forward to the next phase.
 
@@ -108,7 +110,7 @@ always_ff @(posedge clk) begin
     else begin
         case(tx_state)
         IDLE: begin
-            if (txvalid) 
+            if (txvalid)
                 tx_state <= START;
         end
         START: begin
@@ -124,13 +126,13 @@ always_ff @(posedge clk) begin
                 tx_state <= STOP;
         end
         STOP: begin
-            if (sample_cnt == stop_cnt_static) 
+            if (sample_cnt == stop_cnt_static)
                 tx_state <= IDLE;
         end
         endcase
     end
 end
-                
+
 always_ff @(posedge clk) begin
     if(rst) begin
         data_cnt    <= 'b0;
@@ -142,7 +144,7 @@ always_ff @(posedge clk) begin
         stop_cnt_static <= 'b0;
     end
     else begin
-        stop_cnt_static <= (cfg_stop_bits == 2'b00) ? 16 : (cfg_stop_bits == 2'b01) ? 24 : 32;        
+        stop_cnt_static <= (cfg_stop_bits == 2'b00) ? 16 : (cfg_stop_bits == 2'b01) ? 24 : 32;
         case(tx_state)
         IDLE: begin
                 sample_cnt  <= 'b0;
@@ -163,7 +165,7 @@ always_ff @(posedge clk) begin
         end
         PARITY: begin
             sample_cnt  <= sampled_all ? 'b0 : (sample ? sample_cnt + 1 : sample_cnt);
-            uart_tx     <= cfg_parity[1] ^ parity;  
+            uart_tx     <= cfg_parity[1] ^ parity;
         end
         STOP: begin
             sample_cnt  <= sample ? sample_cnt + 1 : sample_cnt;

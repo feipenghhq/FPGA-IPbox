@@ -1,21 +1,24 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+// Copyright 2020 by Heqing Huang (feipenghhq@gamil.com)
+//
 // Project Name: N/A
 // Module Name: I2C controller
 //
 // Author: Heqing Huang
-// Date Created: 10/25/2019
+// Date Created: 10/25/2020
 //
 // ================== Description ==================
 //  A simple I2C controller master.
 //
-//  Version: 10/25/2020 - Ver 1.0
+//  Version 1.0: 10/25/2020
 //  Feature:
 //   1. Configurable system clock and I2c clock frequency
 //   2. Configurable byte size and number of byte. Does not support variable byte
 //      length during each access. The number of by to be transfer must match with
 //      the NUM_BYTE parameter
 //   3. Only support write operation for now. Read will be added later
+//
 ///////////////////////////////////////////////////////////////////////////////
 
 module i2c_master #(

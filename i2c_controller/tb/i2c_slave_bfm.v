@@ -1,5 +1,20 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+// Copyright 2020 by Heqing Huang (feipenghhq@gamil.com)
+//
+// Project Name:
+// Module Name: i2c_slave_bfm
+//
+// Author: Heqing Huang
+// Date Created: 10/27/2020
+//
+// ================== Description ==================
+//
 // I2C slave Bus-Function-Model
 // The I2C BFM assumes that the I2C master will send 4 bytes.
+//
+///////////////////////////////////////////////////////////////////////////////
+
 module i2c_slave_bfm #(
     parameter       CLK_FREQ = 50,          // default 50  MHz system clock
     parameter       I2C_CLK_FREQ = 100,     // default 100 KHz I2C clock

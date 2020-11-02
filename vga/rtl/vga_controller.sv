@@ -1,5 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+// Copyright 2020 by Heqing Huang (feipenghhq@gamil.com)
+//
 // Project Name: VGA
 // Module Name: vga_controller
 //
@@ -10,7 +12,7 @@
 //
 //  This module implements the vga controller logic.
 //
-//  The input clk period is the clock required by the resolution. 
+//  The input clk period is the clock required by the resolution.
 //  All signal in this module are synchronized to the clock.
 //
 //  The access to the frame buffer (video buffer) are pipelined.

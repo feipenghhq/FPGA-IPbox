@@ -1,6 +1,9 @@
 # I<sup>2</sup>C Controller
 
-[TOC]
+- [I<sup>2</sup>C Controller](#isup2supc-controller)
+  - [I<sup>2</sup>C Introduction](#isup2supc-introduction)
+  - [I<sup>2</sup>C Master Controller IP](#isup2supc-master-controller-ip)
+  - [Change Log](#change-log)
 
 ## I<sup>2</sup>C Introduction
 
@@ -13,8 +16,6 @@ Each I<sup>2</sup>C device has a unique address and can operates as master or sl
 ### Electrical characteristics
 
 The I<sup>2</sup>C bus uses open-drain technology. The SDA and SCL lines are connected to voltage source via a pull-up resistor. The SDA and SCL signals from all the devices are connected the SDA and SCL lines respectively.
-
-
 
 <img src="https://upload.wikimedia.org/wikipedia/commons/3/3e/I2C.svg" alt="I2C"   />
 
@@ -50,6 +51,17 @@ In summary: Start   => Send address and access type => Send data => Stop
 >
 > 1. Embedded SoPC Design with Nios II Processor and Verilog Examples. by Pong Chu
 
+## I<sup>2</sup>C Master Controller IP
 
+### Supported Feature
 
-## I<sup>2</sup>C Master Controller
+1. Configurable system clock and I2c clock frequency. Default system clock is 50 MHz,  I<sup>2</sup>C SCL is 100 KHz.
+
+2. Configurable byte size and number of bytes to transfer in each transaction. 
+
+3. Only support write operation for now. Read will be added later
+
+## Change Log
+
+- 10/30/2020:  Version 1.0 - Fixed bugs found in FPGA test.
+- 10/25/2020:  Version 1.0 - Initial Version Created.

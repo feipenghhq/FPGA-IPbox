@@ -1,10 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+// Copyright 2020 by Heqing Huang (feipenghhq@gamil.com)
+//
 // Project Name: WM8731/WM8731L Audio Controller
 // Module Name: audio_controller_csr_tb
 //
 // Author: Heqing Huang
-// Date Created: 10/27/2019
+// Date Created: 10/27/2020
 //
 // ================== Description ==================
 //

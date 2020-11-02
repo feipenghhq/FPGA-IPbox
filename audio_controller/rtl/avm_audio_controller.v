@@ -1,10 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
+// Copyright 2020 by Heqing Huang (feipenghhq@gamil.com)
+//
 // Project Name: WM8731/WM8731L Audio Controller
 // Module Name: avm_audio_controller
 //
 // Author: Heqing Huang
-// Date Created: 10/28/2019
+// Date Created: 10/28/2020
 //
 // ================== Description ==================
 //
