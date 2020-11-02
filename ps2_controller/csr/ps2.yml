@@ -1,0 +1,32 @@
+register:
+
+  data:
+    tx_fifo:
+      size: 8
+      reset: 0x0
+      swtype: FIFOW
+      hwtype: NA
+      note: 'PS2 tx data fifo'
+    rx_fifo:
+      size: 8
+      reset: 0x0
+      swtype: FIFOR
+      hwtype: NA
+      note: 'PS2 rx data fifo'
+
+  status:
+    tx_fifo_full:
+      size: 1
+      reset: 0x0
+      swtype: R
+      hwtype: W
+      note: 'TX path fifo full'
+    rx_fifo_empty:
+      size: 1
+      reset: 0x1
+      swtype: R
+      hwtype: W
+      note: 'RX path fifo empty'
+
+
+

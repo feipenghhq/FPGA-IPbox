@@ -1,0 +1,1 @@
+../../common/rtl/fwft_fifo.v

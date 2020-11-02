@@ -1,0 +1,10 @@
+{ signal: [
+  { name: "CLK",     wave: "1..0101010101010101010101." },
+  { name: "DATA",    wave: "1.0.4.4.4.4.4.4.4.4.4.1...",  data: ["D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7", "Parity"] },
+  { name: "Phase",   wave: "3.3.3...............3.3.3.",  data: ["IDLE", "Start", "Data Transfer", "Parity", "Stop", "IDLE"] },
+  ],
+   head:{
+   text:'Device-to-host communication',
+   tick:0,
+ },
+}
