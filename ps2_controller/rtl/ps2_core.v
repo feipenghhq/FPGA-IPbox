@@ -18,8 +18,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-module ps2_core
-(
+module ps2_core #(
+parameter CLK = 50  // Clock period in MHz
+)(
 input               clk,
 input               rst,
 
@@ -36,22 +37,35 @@ input               hold_req,           // request to hold
 output [7:0]        rcv_data,
 output              rcv_parity_err,
 output              rcv_vld,
-/* verilator lint_off UNUSED */
 input               send_req,
 input [7:0]         send_data,
-/* verilator lint_on UNUSED */
 output              idle
 );
 
 wire        rcv_idle;
+wire        send_idle;
+wire        rx_en;
+wire        rx_busy;
+
+wire        rx_ps2_clk_w;
+wire        rx_ps2_clk_o;
+wire        tx_ps2_data_w;
+wire        tx_ps2_data_o;
+wire        tx_ps2_clk_w;
+wire        tx_ps2_clk_o;
 
 // ================================================
 // Glue logic
 // ================================================
-assign ps2_data_w = 1'b0;
-assign ps2_data_o = 1'b0;
 
-assign idle = rcv_idle;
+assign idle = rcv_idle & send_idle;
+assign rx_busy = ~rcv_idle;
+assign rx_en = send_idle;
+
+assign ps2_clk_w = rx_ps2_clk_w | tx_ps2_clk_w;
+assign ps2_clk_o = (rx_ps2_clk_w & rx_ps2_clk_o) | (tx_ps2_clk_w & tx_ps2_clk_o);
+assign ps2_data_w = tx_ps2_data_w;
+assign ps2_data_o = tx_ps2_data_o;
 
 // ================================================
 // Module Instantiation
@@ -62,14 +76,30 @@ ps2_rx  ps2_rx
     .rst            (rst),
     .ps2_data_i     (ps2_data_i),
     .ps2_clk_i      (ps2_clk_i),
-    .ps2_clk_w      (ps2_clk_w),
-    .ps2_clk_o      (ps2_clk_o),
+    .ps2_clk_w      (rx_ps2_clk_w),
+    .ps2_clk_o      (rx_ps2_clk_o),
     .hold_req       (hold_req),
-    .rx_en          (1'b1),     // always enable rx path for now
+    .rx_en          (rx_en),
     .rcv_data       (rcv_data),
     .rcv_parity_err (rcv_parity_err),
     .rcv_vld        (rcv_vld),
     .rcv_idle       (rcv_idle)
+);
+
+ps2_tx #(.CLK(CLK))  ps2_tx 
+(
+    .clk            (clk),
+    .rst            (rst),
+    .ps2_data_i     (ps2_data_i),
+    .ps2_data_o     (tx_ps2_data_o),
+    .ps2_data_w     (tx_ps2_data_w),
+    .ps2_clk_i      (ps2_clk_i),
+    .ps2_clk_w      (tx_ps2_clk_w),
+    .ps2_clk_o      (tx_ps2_clk_o),
+    .rx_busy        (rx_busy),
+    .send_req       (send_req),
+    .send_data      (send_data),
+    .send_idle      (send_idle)
 );
 
 endmodule

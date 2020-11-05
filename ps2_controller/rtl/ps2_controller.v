@@ -15,7 +15,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 module ps2_controller #(
-parameter SYSCLK = 50       // System clock rate in MHz
+parameter SYSCLK = 50,      // System clock rate in MHz
 parameter RX_FIFO_SIZE = 16,
 parameter TX_FIFO_SIZE = 4
 ) (

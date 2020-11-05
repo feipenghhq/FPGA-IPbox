@@ -156,7 +156,7 @@ always @(*) begin
     ps2_clk_w_q_next = ps2_clk_w_q;
 
     // use next state here so the OFL change aligns with the state change
-    case(state_next)
+    case(state_q)
         IDLE: begin
             rcv_data_q_next = 8'b0;
             rcv_parity_err_q_next = 1'b0;
