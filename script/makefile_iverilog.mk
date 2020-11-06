@@ -63,12 +63,12 @@ run: $(TB_OUT)
 tb: $(TB_OUT)
 
 $(TB_OUT): $(TB_TOP) $(TOP_FILE) $(ALL_SRC_FILES) $(ALL_TB_FILES) $(OUT_DIR)
-	$(IVERILOG) -o $(TB_OUT) $(TB_TOP) -y $(RTL_PATH) -y $(TB_PATH)
+	$(IVERILOG) -o $(TB_OUT) $(TB_TOP) -y $(RTL_PATH) -y $(TB_PATH) -I$(RTL_INCDIR_PATH)
 
 rtl: $(OUT_DIR) $(RTL_OUT)
 
 $(RTL_OUT):	$(TOP_FILE) $(ALL_SRC_FILES)
-	$(IVERILOG) -o $(RTL_OUT) $(TOP_FILE) -y $(RTL_PATH)
+	$(IVERILOG) -o $(RTL_OUT) $(TOP_FILE) -y $(RTL_PATH) -I$(RTL_INCDIR_PATH)
 
 lint:
 	@verilator  -Wall -lint-only $(TOP_FILE) -y $(RTL_PATH)

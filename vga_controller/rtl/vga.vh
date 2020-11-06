@@ -15,6 +15,7 @@
 //
 //  See http://tinyvga.com/vga-timing
 //  for more detail vga timing for different resoultion
+//
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -26,34 +27,35 @@
 // VGA 640x480 //
 /////////////////
 
-// clock 25.125Mhz
+// clock rate 25.125Mhz
 `ifdef _VGA_640_480
-// Horizontal timing
+    // Horizontal timing
     `define HVA 640		// visible area
     `define HFP 16		// front porch
     `define HSP 96		// sync pulse
     `define HBP 48		// back porch
-// Vertical timing
+    // Vertical timing
     `define VVA	480	// visible aread
     `define VFP 10		// front porch
     `define VSP	2		// sync pulse
     `define VBP 33		// back porch
-    `endif
 `endif
 
 //////////////////
 // VGA 1600x900 //
 //////////////////
-// clock 108MHz
+// clock rate 108MHz
 `ifdef _VGA_1600_900
-// Horizontal timing
+    // Horizontal timing
     `define HVA 1600	// visible area
     `define HFP 24		// front porch
     `define HSP 80		// sync pulse
     `define HBP 96		// back porch
-// Vertical timing
+    // Vertical timing
     `define VVA	900		// visible area
     `define VFP 1		// front porch
     `define VSP	3		// sync pulse
     `define VBP 96		// back porch
+`endif
+
 `endif
