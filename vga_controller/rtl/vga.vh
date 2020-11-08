@@ -19,6 +19,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
+`define _VGA_640_480
 
 `ifndef _VGA_VH_
 `define _VGA_VH_
@@ -39,6 +40,9 @@
     `define VFP 10		// front porch
     `define VSP	2		// sync pulse
     `define VBP 33		// back porch
+    // other
+    `define HCNT `HVA
+    `define VCNT `VVA
 `endif
 
 //////////////////
@@ -56,6 +60,8 @@
     `define VFP 1		// front porch
     `define VSP	3		// sync pulse
     `define VBP 96		// back porch
+    `define HCNT `HVA
+    `define VCNT `VVA
 `endif
 
 `endif

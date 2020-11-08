@@ -23,7 +23,7 @@ module vga_sync_tb ();
 parameter HADDRW = $clog2(`HVA);
 parameter VADDRW = $clog2(`VVA);
 parameter CLK_PROD = 10;
-reg                       vga_clk;
+reg                       clk_vga;
 reg                       rst = 1;
 `ifdef ADV7123
 // used only for the ADV7123 chip on DE2 board
@@ -35,8 +35,7 @@ wire                      adv7123_vga_clk;
 wire                      vga_hsync;
 wire                      vga_vsync;
 wire                      vga_video_on;
-wire     [HADDRW-1:0]     vga_h_addr;
-wire     [VADDRW-1:0]     vga_v_addr;
+wire                      first_pixel;
 
 vga_sync dut_vga_sync(.*);
 
@@ -44,7 +43,7 @@ initial
 begin
     rst = 1'b1;
     #100;
-    @(posedge vga_clk);
+    @(posedge clk_vga);
     #1 rst = 1'b0;
     #10000000;
     $finish;
@@ -56,9 +55,9 @@ end
 // ================================================
 initial
 begin
-    vga_clk = 1;
+    clk_vga = 1;
     forever begin
-        #(CLK_PROD/2) vga_clk = ~vga_clk;
+        #(CLK_PROD/2) clk_vga = ~clk_vga;
     end
 end
 
