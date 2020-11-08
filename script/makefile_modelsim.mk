@@ -61,6 +61,9 @@ wave: $(WAVE)
 $(WAVE): $(TB_OUT)
 	$(EXECUTE) $(TB_OUT)
 
+run_gui: $(TB_OUT) $(RTL_OUT)
+	$(EXECUTE) -lib $(LIB) $(TOP_DESIGN)_tb
+
 run: $(TB_OUT) $(RTL_OUT)
 	$(EXECUTE) -lib $(LIB) $(TOP_DESIGN)_tb  -c -do "run -all"
 

@@ -6,7 +6,7 @@
 // Module Name: vga_controller_tb
 //
 // Author: Heqing Huang
-// Date Created: 05/09/2019
+// Date Created: 11/07/2019
 //
 // ================== Description ==================
 //
@@ -24,7 +24,7 @@ parameter HADDRW = $clog2(`HVA);
 parameter VADDRW = $clog2(`VVA);
 parameter CLK_PROD = 10;
 reg                       clk_vga;
-reg                       rst = 1;
+reg                       rst_vga = 1;
 `ifdef ADV7123
 // used only for the ADV7123 chip on DE2 board
 wire                      adv7123_vga_blank;
@@ -41,10 +41,10 @@ vga_sync dut_vga_sync(.*);
 
 initial
 begin
-    rst = 1'b1;
+    rst_vga = 1'b1;
     #100;
     @(posedge clk_vga);
-    #1 rst = 1'b0;
+    #1 rst_vga = 1'b0;
     #10000000;
     $finish;
 end

@@ -3,23 +3,21 @@
 // Copyright 2020 by Heqing Huang (feipenghhq@gamil.com)
 //
 // Project Name: VGA
-// Module Name: vga_controller
+// Module Name: avm_vga_controller
 //
 // Author: Heqing Huang
-// Date Created: 11/07/2020
+// Date Created: 11/08/2020
 //
 // ================== Description ==================
 //
-// VGA controller top level.
-// Instantiate the vga_sync and vga_vram_buffer
-// Decode the pixel data into R/G/B channel.
+// Avalon Memory Mapped VGA controller.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
 `define ADV7123
 `define _8BIT // use 8 bit pixel
 
-module vga_controller #(
+module avm_vga_controller #(
 parameter PWIDTH  = 8,      // pixel width
 parameter AWIDTH  = 19,     // should be $clog2(`VCNT) + $clog2(`HCNT)
 parameter LATENCY = 4,      // vram read latency
@@ -31,67 +29,40 @@ input                   clk_vga,
 input                   rst_vga,
 input                   clk_core,
 input                   rst_core,
-
-`ifdef ADV7123
 // used only for the ADV7123 chip on DE2 board
+`ifdef ADV7123
 output                  adv7123_vga_blank,
 output                  adv7123_vga_sync,
 output                  adv7123_vga_clk,
 `endif
-
+// VGA signal
 output                  vga_hsync,
 output                  vga_vsync,
 output                  vga_video_on,
 output [RWIDTH-1:0]     vga_r,
 output [GWIDTH-1:0]     vga_g,
 output [BWIDTH-1:0]     vga_b,
-
-input                   vram_busy,
-output [AWIDTH-1:0]     vram_addr,
-output                  vram_rd,
-input [PWIDTH-1:0]      vram_data,
-input                   vram_vld,
-output                  resync_err
+output                  resync_err,
+// AVM VRAM signal
+input                   avm_waitrequest,
+input [PWIDTH-1:0]      avm_readdata,
+input                   avm_readdatavalid,
+output [AWIDTH-1:0]     avm_address,
+output                  avm_read
 );
 
-wire [PWIDTH-1:0]       vga_pixel;
-/* verilator lint_off UNUSED */
-wire                    first_pixel;
-/* verilator lint_on UNUSED */
-
-
-`ifdef _8BIT // use 8 bit pixel
-    assign vga_r = {vga_pixel[7:5], {(RWIDTH - 3){1'b0}}};
-    assign vga_g = {vga_pixel[4:2], {(GWIDTH - 3){1'b0}}};
-    assign vga_b = {vga_pixel[1:0], {(BWIDTH - 2){1'b0}}};
-`else // output white screen
-    assign vga_r = {RWIDTH{1'b1}};
-    assign vga_g = {GWIDTH{1'b1}};
-    assign vga_b = {BWIDTH{1'b1}};
-`endif
-
-
-vga_vram_buffer #(
+vga_controller #(
     .PWIDTH(PWIDTH),
-    .LATENCY(LATENCY)
-) vga_vram_buffer (
-    .clk_vga    (clk_vga),
-    .rst_vga    (rst_vga),
-    .vga_rd     (vga_video_on),
-    .vga_pixel  (vga_pixel),
-    .clk_core   (clk_core),
-    .rst_core   (rst_core),
-    .vram_busy  (vram_busy),
-    .vram_addr  (vram_addr),
-    .vram_rd    (vram_rd),
-    .vram_data  (vram_data),
-    .vram_vld   (vram_vld),
-    .resync_err (resync_err)
-);
-
-vga_sync vga_sync (
+    .AWIDTH(AWIDTH),
+    .LATENCY(LATENCY),
+    .RWIDTH(RWIDTH),
+    .GWIDTH(GWIDTH),
+    .BWIDTH(BWIDTH)
+) vga_controller (
     .clk_vga            (clk_vga),
     .rst_vga            (rst_vga),
+    .clk_core           (clk_core),
+    .rst_core           (rst_core),
     `ifdef ADV7123
     .adv7123_vga_blank  (adv7123_vga_blank),
     .adv7123_vga_sync   (adv7123_vga_sync),
@@ -100,7 +71,15 @@ vga_sync vga_sync (
     .vga_hsync          (vga_hsync),
     .vga_vsync          (vga_vsync),
     .vga_video_on       (vga_video_on),
-    .first_pixel        (first_pixel)
+    .vga_r              (vga_r),
+    .vga_g              (vga_g),
+    .vga_b              (vga_b),
+    .vram_busy          (avm_waitrequest),
+    .vram_addr          (avm_address),
+    .vram_rd            (avm_read),
+    .vram_data          (avm_readdata),
+    .vram_vld           (avm_readdatavalid),
+    .resync_err         (resync_err)
 );
 
 endmodule

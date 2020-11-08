@@ -27,7 +27,7 @@ parameter HADDRW = $clog2(`HVA),      // horizontal address width
 parameter VADDRW = $clog2(`VVA)       // vertical address width
 )(
 input                       clk_vga,
-input                       rst,
+input                       rst_vga,
 
 `ifdef ADV7123
 // used only for the ADV7123 chip on DE2 board
@@ -70,7 +70,7 @@ wire h_tick;         // horizontal scan completes
 //==========================================
 
 always @(posedge clk_vga) begin
-    if (rst) begin
+    if (rst_vga) begin
         h_state_q <= SP;
     end
     else begin
@@ -90,7 +90,7 @@ end
 //==========================================
 
 always @(posedge clk_vga) begin
-    if (rst) begin
+    if (rst_vga) begin
         h_count_q <= 'b0;
     end
     else begin
@@ -114,7 +114,7 @@ assign h_tick = (h_state_q == FP && h_count_q == `HFP-1);
 // vertical state machine
 //======================================
 always @(posedge clk_vga) begin
-    if (rst) begin
+    if (rst_vga) begin
         v_state_q <= SP;
     end
     else if (h_tick) begin
@@ -133,7 +133,7 @@ end
 // vertical OFL
 //======================================
 always @(posedge clk_vga) begin
-    if (rst) begin
+    if (rst_vga) begin
         v_count_q <= 'b0;
     end
     else if (h_tick) begin
@@ -157,7 +157,7 @@ assign horizontal_on    = (h_state_q == VA) ? 1'b1 : 1'b0;
 assign vertical_on      = (v_state_q == VA) ? 1'b1 : 1'b0;
 
 always @(posedge clk_vga) begin
-    if (rst) begin
+    if (rst_vga) begin
         hsync_q <= 1'b0;
         vsync_q <= 1'b0;
         video_on_q <= 1'b0;
@@ -181,7 +181,7 @@ assign first_pixel = first_pixel_q;
     assign adv7123_vga_clk = clk_vga;
 
     always @(posedge clk_vga) begin
-        if (rst) adv7123_vga_blank <= 1'b1;
+        if (rst_vga) adv7123_vga_blank <= 1'b1;
         else adv7123_vga_blank <= hsync_q & vsync_q;
     end
 `endif
