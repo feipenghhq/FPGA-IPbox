@@ -2,3 +2,5 @@ modelsim
 output
 *vcd
 *~
+transcript
+*_lib

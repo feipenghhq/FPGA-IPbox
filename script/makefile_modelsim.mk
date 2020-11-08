@@ -14,13 +14,16 @@
 # 	TB_FILE		: Testbench top level file
 # 	WAVE		: vcd dump name
 #
+# Check this page for more modelsim command:
+# http://people.cs.pitt.edu/~don/coe1502/Reference/vsim_quickref.pdf
+#
 # =================================================================
 
 # =============================
 # Tool Variable
 # =============================
-COMPILE 	= iverilog
-EXECUTE     = vvp
+COMPILE 	= vlog
+EXECUTE     = vsim
 GTKWAVE 	= gtkwave
 VERILATOR	= verilator
 
@@ -31,15 +34,16 @@ OUT_DIR		  = output
 
 ALL_SRC_FILES = $(shell find $(RTL_PATH) -name "*.v" -type f)
 ALL_TB_FILES  = $(shell find $(TB_PATH) -name "*.v" -type f)
-RTL_OUT		  = $(OUT_DIR)/$(TOP_DESIGN)
-TB_OUT		  = $(OUT_DIR)/$(TOP_DESIGN)_tb
+LIB 		  = $(TOP_DESIGN)_lib
+RTL_OUT		  = $(LIB)/$(TOP_DESIGN)
+TB_OUT		  = $(LIB)/$(TOP_DESIGN)_tb
 
 
 # =============================
 # Command
 # =============================
 
-.PHONY: clean help wave run tb rtl lint clean
+.PHONY: clean help wave run tb rtl lib lint clean
 
 help:
 	@echo 	"Usage: "
@@ -57,25 +61,26 @@ wave: $(WAVE)
 $(WAVE): $(TB_OUT)
 	$(EXECUTE) $(TB_OUT)
 
-run: $(TB_OUT)
-	$(EXECUTE) $(TB_OUT)
+run: $(TB_OUT) $(RTL_OUT)
+	$(EXECUTE) -lib $(LIB) $(TOP_DESIGN)_tb  -c -do "run -all"
 
-tb: $(TB_OUT)
+tb: $(LIB) $(TB_OUT)
 
-$(TB_OUT): $(TB_FILE) $(TOP_FILE) $(ALL_SRC_FILES) $(ALL_TB_FILES) $(OUT_DIR)
-	$(COMPILE) -o $(TB_OUT) $(TB_FILE) -y $(RTL_PATH) -y $(TB_PATH) -I$(RTL_INCDIR_PATH)
+$(TB_OUT): $(TB_FILE) $(TOP_FILE) $(ALL_SRC_FILES) $(ALL_TB_FILES) $(LIB)
+	$(COMPILE) $(TB_FILE) -work $(LIB) -y $(RTL_PATH) -y $(TB_PATH) +incdir+$(RTL_INCDIR_PATH) +libext+.v+.sv
 
-rtl: $(OUT_DIR) $(RTL_OUT)
+rtl: $(LIB) $(RTL_OUT)
 
 $(RTL_OUT):	$(TOP_FILE) $(ALL_SRC_FILES)
-	$(COMPILE) -o $(RTL_OUT) $(TOP_FILE) -y $(RTL_PATH) -I$(RTL_INCDIR_PATH)
+	$(COMPILE) $(TOP_FILE) -work $(LIB) -y $(RTL_PATH) +incdir+$(RTL_INCDIR_PATH) -lint
+
+$(LIB):
+	vlib $(LIB)
+
 
 lint:
 	@verilator  -Wall -lint-only $(TOP_FILE) -y $(RTL_PATH)
 	@echo "No Issue Found"
 
-$(OUT_DIR):
-	mkdir $(OUT_DIR)
-
 clean:
-	rm -rf $(OUT_DIR) *.vcd
+	rm -rf $(LIB) *.vcd transcript

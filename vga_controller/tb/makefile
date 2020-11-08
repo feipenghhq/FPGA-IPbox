@@ -16,7 +16,7 @@ else
 endif
 
 TOP_FILE 	= $(RTL_PATH)$(TOP_DESIGN).v
-TB_TOP		= $(TOP_DESIGN)_tb.v
+TB_FILE		= $(TOP_DESIGN)_tb.v
 WAVE		= $(TOP_DESIGN).vcd
 
 include ../../script/makefile_iverilog.mk

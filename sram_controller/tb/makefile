@@ -4,13 +4,14 @@
 
 # Verilog src path
 RTL_PATH = ../rtl/
+RTL_INCDIR_PATH = $(RTL_PATH)
 TB_PATH = ./
 
 ALL_SRC_FILES = $(shell find $(RTL_PATH) -type f)
 
 TOP_DESIGN	= avm_sram_controller
 TOP_FILE 	= $(RTL_PATH)$(TOP_DESIGN).v
-TB_TOP		= $(TOP_DESIGN)_tb.v
+TB_FILE		= $(TOP_DESIGN)_tb.v
 WAVE		= dump.vcd
 
 include ../../script/makefile_iverilog.mk
