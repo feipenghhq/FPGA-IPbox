@@ -17,16 +17,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 `define ADV7123
-`define _8BIT // use 8 bit pixel
 
 module vga_controller #(
-parameter BUFSIZE = 512,
-parameter PWIDTH  = 8,      // pixel width
-parameter AWIDTH  = 19,     // should be $clog2(`VCNT) + $clog2(`HCNT)
+parameter BUFSIZE = 128,    // Pixel buffer FIFO size.
+parameter PWIDTH  = 8,      // Pixel width
+parameter AWIDTH  = 19,     // vram address size. Should be $clog2(`VCNT) + $clog2(`HCNT)
 parameter LATENCY = 2,      // vram read latency
-parameter RWIDTH  = 10,
-parameter GWIDTH  = 10,
-parameter BWIDTH  = 10
+parameter RWIDTH  = 10,     // R color width
+parameter GWIDTH  = 10,     // G color width
+parameter BWIDTH  = 10,     // B color width
+parameter COLORTYPE  = 0   // color type. 0: 8 bit color
 ) (
 input                   clk_vga,
 input                   rst_vga,
@@ -59,15 +59,18 @@ wire [PWIDTH-1:0]       vga_pixel;
 wire                    first_pixel;
 
 
-`ifdef _8BIT // use 8 bit pixel
+generate
+if (COLORTYPE == 0) begin // use 8 bit pixel
     assign vga_r = {vga_pixel[7:5], {(RWIDTH - 3){1'b0}}};
     assign vga_g = {vga_pixel[4:2], {(GWIDTH - 3){1'b0}}};
     assign vga_b = {vga_pixel[1:0], {(BWIDTH - 2){1'b0}}};
-`else // output white screen
+end
+else begin// output white screen
     assign vga_r = {RWIDTH{1'b1}};
     assign vga_g = {GWIDTH{1'b1}};
     assign vga_b = {BWIDTH{1'b1}};
-`endif
+end
+endgenerate
 
 
 vga_vram_buffer #(

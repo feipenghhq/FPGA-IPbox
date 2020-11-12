@@ -15,16 +15,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 `define ADV7123
-`define _8BIT // use 8 bit pixel
 
 module avmm_vga_controller #(
-parameter BUFSIZE = 512,
-parameter PWIDTH  = 8,      // pixel width
-parameter AWIDTH  = 19,     // should be $clog2(`VCNT) + $clog2(`HCNT)
-parameter LATENCY = 4,      // vram read latency
-parameter RWIDTH  = 10,
-parameter GWIDTH  = 10,
-parameter BWIDTH  = 10
+parameter BUFSIZE = 128,   // Pixel buffer FIFO size.
+parameter PWIDTH  = 8,     // Pixel width
+parameter AWIDTH  = 19,    // vram address size. Should be $clog2(`VCNT) + $clog2(`HCNT)
+parameter LATENCY = 4,     // vram read latency
+parameter RWIDTH  = 10,    // R color width
+parameter GWIDTH  = 10,    // G color width
+parameter BWIDTH  = 10,    // B color width
+parameter COLORTYPE  = 0   // color type. 0: 8 bit color
 ) (
 input                   clk_vga,
 input                   rst_vga,
@@ -53,12 +53,14 @@ output                  avm_read
 );
 
 vga_controller #(
+    .BUFSIZE(BUFSIZE),
     .PWIDTH(PWIDTH),
     .AWIDTH(AWIDTH),
     .LATENCY(LATENCY),
     .RWIDTH(RWIDTH),
     .GWIDTH(GWIDTH),
-    .BWIDTH(BWIDTH)
+    .BWIDTH(BWIDTH),
+    .COLORTYPE(COLORTYPE)
 ) vga_controller (
     .clk_vga            (clk_vga),
     .rst_vga            (rst_vga),
@@ -80,7 +82,7 @@ vga_controller #(
     .vram_rd            (avm_read),
     .vram_data          (avm_readdata),
     .vram_vld           (avm_readdatavalid),
-    .out_sync         (out_sync)
+    .out_sync           (out_sync)
 );
 
 endmodule
