@@ -20,9 +20,10 @@
 `define _8BIT // use 8 bit pixel
 
 module vga_controller #(
+parameter BUFSIZE = 512,
 parameter PWIDTH  = 8,      // pixel width
 parameter AWIDTH  = 19,     // should be $clog2(`VCNT) + $clog2(`HCNT)
-parameter LATENCY = 4,      // vram read latency
+parameter LATENCY = 2,      // vram read latency
 parameter RWIDTH  = 10,
 parameter GWIDTH  = 10,
 parameter BWIDTH  = 10
@@ -51,13 +52,11 @@ output [AWIDTH-1:0]     vram_addr,
 output                  vram_rd,
 input [PWIDTH-1:0]      vram_data,
 input                   vram_vld,
-output                  resync_err
+output                  out_sync
 );
 
 wire [PWIDTH-1:0]       vga_pixel;
-/* verilator lint_off UNUSED */
 wire                    first_pixel;
-/* verilator lint_on UNUSED */
 
 
 `ifdef _8BIT // use 8 bit pixel
@@ -72,12 +71,14 @@ wire                    first_pixel;
 
 
 vga_vram_buffer #(
+    .BUFSIZE(BUFSIZE),
     .PWIDTH(PWIDTH),
     .LATENCY(LATENCY)
 ) vga_vram_buffer (
     .clk_vga    (clk_vga),
     .rst_vga    (rst_vga),
     .vga_rd     (vga_video_on),
+    .first_pixel(first_pixel),
     .vga_pixel  (vga_pixel),
     .clk_core   (clk_core),
     .rst_core   (rst_core),
@@ -86,7 +87,7 @@ vga_vram_buffer #(
     .vram_rd    (vram_rd),
     .vram_data  (vram_data),
     .vram_vld   (vram_vld),
-    .resync_err (resync_err)
+    .out_sync   (out_sync)
 );
 
 vga_sync vga_sync (

@@ -20,31 +20,24 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 //
-// A note about the re-sync logic:
+// One Important note for the VRAM controller:
 //
-// Bcause we use the async-FIFO to buffer the VRAM data, it ack like a
+// Bcause we use the async-FIFO to buffer the VRAM data, it acts like a
 // stream buffer and there is no address. VGA side will always assume
 // that the next data it read from the FIFO is at the current address.
 // This assumption is true as long as the write side writes the data
 // at the correct address sequence.
 //
-// However, this convension will be broken when the FIFO is empty.
-// VGA side will still read the data since it can not stop. When
-// The FIFO become non-empty again, the data on the TOP is actual
-// the missed data, and if it's get read then it's not the correct
-// pixel for that location.
-//
-// To deal with this situation, when FIFO become empty, we will clear
-// the FIFO, refetch the data from the first location, and stop the VGA
-// from reading the FIFO (by provide junk data unfortunately), and once VGA
-// start from the new data, then we will resume the read.
+// However, this convension break when the FIFO is empty and VGA is still
+// reading. VGA can't stop so it will read the invalid data.
+// And when FIFO becomes non-empty again, the data on the TOP of the FIFO
+// is not the currect VGA data anymore.
 //
 // Ideally we should not hit this situation because we should make sure the
-// VRAM read path get enough bandwidth to fetch the data. But if it happens
-// for any reason, this re-sync logic will help to prevent the display being
-// unaligned.
+// VRAM read path get enough bandwidth to fetch the data.
 //
-// FIXME: THIS FEATURE WILL BE IMPLEMENTED LATER AFTER COMPLETE BASIC FUNCTION
+// If this error does happen, then there is no way to recover for now except for
+// resetting the vga controller
 //
 
 
@@ -52,7 +45,8 @@
 
 module vga_vram_buffer #(
 parameter PWIDTH  = 8,      // pixel width
-parameter LATENCY = 4,      // vram read latency
+parameter LATENCY = 2,      // vram read latency
+parameter BUFSIZE = 1 << $clog2(`HCNT),    // buffer size
 parameter HWIDTH = $clog2(`HCNT),   // Fixed parameter
 parameter VWIDTH = $clog2(`VCNT),   // Fixed parameter
 parameter AWIDTH = HWIDTH + VWIDTH  // Fixed parameter
@@ -61,7 +55,7 @@ parameter AWIDTH = HWIDTH + VWIDTH  // Fixed parameter
 input                   clk_vga,
 input                   rst_vga,
 input                   vga_rd,
-//input                   first_pixel, // indicate this read is the first pixel.
+input                   first_pixel, // indicate this read is the first pixel.
 output [PWIDTH-1:0]     vga_pixel,
 // Core side
 input                   clk_core,
@@ -71,25 +65,37 @@ output [AWIDTH-1:0]     vram_addr,
 output                  vram_rd,
 input [PWIDTH-1:0]      vram_data,
 input                   vram_vld,
-output                  resync_err  // need a resync happends, to help debug
+output                  out_sync
 );
 
 // =====================================
 // Common signal/parameter
 // =====================================
-localparam BUFSIZE = 1 << $clog2(`HCNT);    // buffer size
-localparam WR_LATENCY = 10;                 // number of cycle takes to get a write data.
-localparam RD_LATENCY = 0;                  // not really used
+localparam AMOST_FULL = LATENCY + 1 + 1;    // Latency + current cycle + potential current write operation
+localparam AMOST_EMPTY = 0;             // not really used
 
 // =====================================
 // VGA side
 // =====================================
-wire                buffer_empty;
-//wire                resync_req_vga;
-wire                fifo_rd;
 
-assign resync_err = buffer_empty & vga_rd;
-assign fifo_rd = ~buffer_empty & vga_rd;
+//
+// We need to wait for the FIFO becomes non-empty then start the read process.
+// This is to make sure we are in sync.
+//
+wire                buffer_empty;
+wire                fifo_rd;
+wire                first_rd_vld;   // indicate first read and buffer is not empty
+
+reg                 in_sync;
+
+always @(posedge clk_vga) begin
+    if (rst_vga) in_sync <= 1'b0;
+    else if (first_rd_vld) in_sync <= 1'b1;
+end
+
+assign first_rd_vld = vga_rd & first_pixel & ~buffer_empty;
+assign out_sync = buffer_empty & vga_rd;
+assign fifo_rd = (~buffer_empty & vga_rd & in_sync) | first_rd_vld;
 
 // =====================================
 // Core side
@@ -104,9 +110,12 @@ wire            h_tick;
 wire            v_tick;
 wire            fifo_wr;
 
+// we should not issue read request while we are in reset.
+// This cause a bug in the design if we do so.
+assign vram_rd = ~buffer_almost_full & ~vram_busy & ~rst_core;
 assign vram_addr = {v_addr, h_addr};
-assign vram_rd = ~buffer_almost_full & ~vram_busy;
 assign fifo_wr = ~buffer_full & vram_vld;   // ideally vram buffer should never be full
+
 
 assign h_tick = (h_addr == `HVA-1);
 assign v_tick = (v_addr == `VVA-1);
@@ -135,8 +144,8 @@ end
 fwft_async_fifo #(
     .DWIDTH(PWIDTH),
     .DEPTH(BUFSIZE),
-    .AMOST_FULL(WR_LATENCY),
-    .AMOST_EMPTY(RD_LATENCY)
+    .AMOST_FULL(AMOST_FULL),
+    .AMOST_EMPTY(AMOST_EMPTY)
 ) vram_buffer (
     .rst_rd         (rst_vga),
     .clk_rd         (clk_vga),

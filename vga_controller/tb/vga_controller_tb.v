@@ -15,6 +15,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+`timescale 1ns/1ns
+
 `define ADV7123
 `define _VGA_640_480    // define the macro first before importing the file
 `include "vga.vh"
@@ -28,8 +30,8 @@ parameter RWIDTH  = 10;
 parameter GWIDTH  = 10;
 parameter BWIDTH  = 10;
 
-parameter CLK_VGA = 20;
-parameter CLK_CORE = 10;
+parameter CLK_VGA = 8;
+parameter CLK_CORE = 4;
 
 reg                   clk_vga;
 reg                   rst_vga = 1;
@@ -46,9 +48,9 @@ wire [BWIDTH-1:0]     vga_b;
 reg                   vram_busy = 0;
 wire [AWIDTH-1:0]     vram_addr;
 wire                  vram_rd;
-reg [PWIDTH-1:0]      vram_data;
-reg                   vram_vld = 0;
-wire                  resync_err;
+wire [PWIDTH-1:0]     vram_data;
+wire                  vram_vld;
+wire                  out_sync;
 
 `ifdef ADV7123
 wire                  adv7123_vga_blank;
@@ -62,14 +64,31 @@ vga_controller dut_vga_controller (.*);
 initial
 begin
     wait(rst_vga == 0 && rst_core == 0);
-    #10000000;
+    #4800000;
     $finish;
 end
 
+wire [9:0] h_addr;
+wire [8:0] v_addr;
+reg                 vram_vld_ff[2:0];
+reg  [PWIDTH-1:0]   vram_data_ff[2:0];
 
-always @(*) begin
-    vram_data = vram_addr;
-    vram_vld = vram_rd;
+assign {v_addr, h_addr} = vram_addr;
+assign vram_data = vram_data_ff[2];
+assign vram_vld = vram_vld_ff[2];
+
+always @(posedge clk_core) begin
+    if (v_addr < 100 )
+        vram_data_ff[0] <= 8'hFF;
+    else
+        vram_data_ff[0] <= 8'hE0;
+    vram_vld_ff[0] <= vram_rd;
+
+    vram_data_ff[1] <= vram_data_ff[0];
+    vram_data_ff[2] <= vram_data_ff[1];
+
+    vram_vld_ff[1] <= vram_vld_ff[0];
+    vram_vld_ff[2] <= vram_vld_ff[1];
 end
 
 // ================================================

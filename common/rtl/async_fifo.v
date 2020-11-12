@@ -71,7 +71,7 @@ wire [AWIDTH-1:0]   wr_addr;
 // CDC logic
 genvar i;
 generate
-    for (i = 0; i <= AWIDTH; i = i + 1) begin
+    for (i = 0; i <= AWIDTH; i = i + 1) begin: cdc_rd
         dsync wrptr_gry_dsync(.D(wrptr_gry[i]), .Q(wrptr_gry_clk_rd[i]), .rst(rst_rd), .clk(clk_rd));
     end
 endgenerate
@@ -103,7 +103,7 @@ end
 // CDC logic
 genvar j;
 generate
-    for (j = 0; j <= AWIDTH; j = j + 1) begin
+    for (j = 0; j <= AWIDTH; j = j + 1) begin: cdc_wr
         dsync wrptr_gry_dsync(.D(rdptr_gry[j]), .Q(rdptr_gry_clk_wr[j]), .rst(rst_wr), .clk(clk_wr));
     end
 endgenerate

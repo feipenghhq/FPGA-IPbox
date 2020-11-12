@@ -57,12 +57,12 @@ assign credit_rst = &each_credit_rst;
 
 genvar i;
 generate
-for (i = 0; i < WIDTH; i = i + 1) begin
+for (i = 0; i < WIDTH; i = i + 1) begin: _
 
     assign credit[i] = credits[CREDIT_WIDTH*(i+1)-1:CREDIT_WIDTH*i];
     assign credit_avail[i] = (credit_q[i] != 0);
     assign each_credit_rst[i] = ~credit_avail[i];
-    assign self_mask[i] = ~(1 << i);
+    assign self_mask[i] = ~(1'b1 << i);
     assign req_from_others[i] = |(self_mask[i] & req);
 
     if (i > 0)

@@ -53,8 +53,8 @@ reg                 prefetched;
 // or read when FIFO is not empty and there is a new read request
 assign read_int = (~prefetched & ~empty_int) | (prefetched & ~empty_int & read);
 
-// when both the buffer and fifo are empty, it's truly empty for it's customer.
-assign empty = ~prefetched & empty_int;
+// If we are have not prefetched anything than we must be empty
+assign empty = ~prefetched;
 
 // use the original almost_empty, but actually we have 1 more item away from the true almost empty.
 assign almost_empty = almost_empty_int;
@@ -64,7 +64,7 @@ always @(posedge clk_rd) begin
         prefetched <= 1'b0;
     end
     else begin
-        prefetched <= (~prefetched & read_int) | (prefetched & read & read_int) & (prefetched & ~read);
+        prefetched <= (~prefetched & read_int) | (prefetched & read & read_int) | (prefetched & ~read);
     end
 end
 

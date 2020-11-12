@@ -3,7 +3,7 @@
 // Copyright 2020 by Heqing Huang (feipenghhq@gamil.com)
 //
 // Project Name: VGA
-// Module Name: avm_vga_controller
+// Module Name: avmm_vga_controller
 //
 // Author: Heqing Huang
 // Date Created: 11/08/2020
@@ -17,7 +17,8 @@
 `define ADV7123
 `define _8BIT // use 8 bit pixel
 
-module avm_vga_controller #(
+module avmm_vga_controller #(
+parameter BUFSIZE = 512,
 parameter PWIDTH  = 8,      // pixel width
 parameter AWIDTH  = 19,     // should be $clog2(`VCNT) + $clog2(`HCNT)
 parameter LATENCY = 4,      // vram read latency
@@ -42,8 +43,8 @@ output                  vga_video_on,
 output [RWIDTH-1:0]     vga_r,
 output [GWIDTH-1:0]     vga_g,
 output [BWIDTH-1:0]     vga_b,
-output                  resync_err,
-// AVM VRAM signal
+output                  out_sync,
+// Avalon Memory Mapped Master for access VRAM
 input                   avm_waitrequest,
 input [PWIDTH-1:0]      avm_readdata,
 input                   avm_readdatavalid,
@@ -79,7 +80,7 @@ vga_controller #(
     .vram_rd            (avm_read),
     .vram_data          (avm_readdata),
     .vram_vld           (avm_readdatavalid),
-    .resync_err         (resync_err)
+    .out_sync         (out_sync)
 );
 
 endmodule
