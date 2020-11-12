@@ -1,9 +1,9 @@
-# Avalon Mapped SRAM Controller
+# Avalon Memory Mapped SRAM Controller
 
-- [Avalon Mapped SRAM Controller](#avalon-mapped-sram-controller)
+- [Avalon Memory Mapped SRAM Controller](#avalon-memory-mapped-sram-controller)
   - [Introduction](#introduction)
   - [Version](#version)
-  - [Specification](#specification)
+  - [Document](#document)
   - [Timing Diagram](#timing-diagram)
   - [Change Log](#change-log)
 
@@ -15,9 +15,9 @@ The SRAM chip used in the DE1/DE2 FPGA board is **IS61LV25616** from ISSI.
 
 ## Version
 
-Ver 2.0
+Ver 2.1
 
-## Specification
+## Document
 
 1. This IP supports fixed 32 bit data width
 
@@ -27,7 +27,7 @@ Ver 2.0
 
 4. The input address from avalon mm interface is byte address and it should be 4 byte (32 bit) aligned. The IP does not check if the address is byte aligned or not. Wrong address may result in wrong data being read/write.
 
-5. The output address to SRAM in the word address and each work is 16 bits. (The size of the SRAM) 
+5. The output address to SRAM in the word address and each work is 16 bits. (The size of the SRAM)
 
 ## Timing Diagram
 
@@ -41,6 +41,6 @@ Ver 2.0
 
 ## Change Log
 
+- 10/10/2020: Revision 2.1 - Changed the interface rom 'avm' name to 'avs' to matches with Altera naming convention.
 - 10/10/2020: Revision 2.0
-
 - 10/07/2020: Revision 1.0 - Initial Version.

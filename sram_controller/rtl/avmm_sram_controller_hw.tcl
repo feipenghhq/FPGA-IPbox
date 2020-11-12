@@ -3,21 +3,21 @@
 # DO NOT MODIFY
 
 
-# 
+#
 # sram_controller "SRAM Controller" v2.0
 # Heqing Huang 2020.10.25.00:18:40
 # Avalon Memory Mapped SRAM controller
-# 
+#
 
-# 
+#
 # request TCL package from ACDS 13.1
-# 
+#
 package require -exact qsys 13.1
 
 
-# 
+#
 # module sram_controller
-# 
+#
 set_module_property DESCRIPTION "Avalon Memory Mapped SRAM controller"
 set_module_property NAME sram_controller
 set_module_property VERSION 2.0
@@ -33,33 +33,33 @@ set_module_property REPORT_TO_TALKBACK false
 set_module_property ALLOW_GREYBOX_GENERATION false
 
 
-# 
+#
 # file sets
-# 
+#
 add_fileset QUARTUS_SYNTH QUARTUS_SYNTH "" ""
-set_fileset_property QUARTUS_SYNTH TOP_LEVEL avm_sram_controller
+set_fileset_property QUARTUS_SYNTH TOP_LEVEL avmm_sram_controller
 set_fileset_property QUARTUS_SYNTH ENABLE_RELATIVE_INCLUDE_PATHS false
-add_fileset_file avm_sram_controller.v VERILOG PATH avm_sram_controller.v TOP_LEVEL_FILE
+add_fileset_file avmm_sram_controller.v VERILOG PATH avmm_sram_controller.v TOP_LEVEL_FILE
 
 add_fileset SIM_VERILOG SIM_VERILOG "" ""
-set_fileset_property SIM_VERILOG TOP_LEVEL avm_sram_controller
+set_fileset_property SIM_VERILOG TOP_LEVEL avmm_sram_controller
 set_fileset_property SIM_VERILOG ENABLE_RELATIVE_INCLUDE_PATHS false
-add_fileset_file avm_sram_controller.v VERILOG PATH avm_sram_controller.v
+add_fileset_file avmm_sram_controller.v VERILOG PATH avmm_sram_controller.v
 
 
-# 
+#
 # parameters
-# 
+#
 
 
-# 
+#
 # display items
-# 
+#
 
 
-# 
+#
 # connection point clock
-# 
+#
 add_interface clock clock end
 set_interface_property clock clockRate 50000000
 set_interface_property clock ENABLED true
@@ -70,9 +70,9 @@ set_interface_property clock SVD_ADDRESS_GROUP ""
 add_interface_port clock clk clk Input 1
 
 
-# 
+#
 # connection point reset
-# 
+#
 add_interface reset reset end
 set_interface_property reset associatedClock clock
 set_interface_property reset synchronousEdges DEASSERT
@@ -84,9 +84,9 @@ set_interface_property reset SVD_ADDRESS_GROUP ""
 add_interface_port reset reset reset Input 1
 
 
-# 
+#
 # connection point sram
-# 
+#
 add_interface sram conduit end
 set_interface_property sram associatedClock ""
 set_interface_property sram associatedReset ""
@@ -105,9 +105,9 @@ add_interface_port sram sram_lb_n export Output 1
 add_interface_port sram sram_readdata export Input 16
 
 
-# 
+#
 # connection point s1
-# 
+#
 add_interface s1 avalon end
 set_interface_property s1 addressUnits SYMBOLS
 set_interface_property s1 associatedClock clock
@@ -131,12 +131,12 @@ set_interface_property s1 EXPORT_OF ""
 set_interface_property s1 PORT_NAME_MAP ""
 set_interface_property s1 SVD_ADDRESS_GROUP ""
 
-add_interface_port s1 avm_address address Input 19
-add_interface_port s1 avm_byteenable byteenable Input 4
-add_interface_port s1 avm_read read Input 1
-add_interface_port s1 avm_write write Input 1
-add_interface_port s1 avm_writedata writedata Input 32
-add_interface_port s1 avm_readdata readdata Output 32
+add_interface_port s1 avs_address address Input 19
+add_interface_port s1 avs_byteenable byteenable Input 4
+add_interface_port s1 avs_read read Input 1
+add_interface_port s1 avs_write write Input 1
+add_interface_port s1 avs_writedata writedata Input 32
+add_interface_port s1 avs_readdata readdata Output 32
 set_interface_assignment s1 embeddedsw.configuration.isFlash 0
 set_interface_assignment s1 embeddedsw.configuration.isMemoryDevice 1
 set_interface_assignment s1 embeddedsw.configuration.isNonVolatileStorage 0

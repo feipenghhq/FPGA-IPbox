@@ -3,13 +3,13 @@
 // Copyright 2020 by Heqing Huang (feipenghhq@gamil.com)
 //
 // Project Name: N/A
-// Module Name: avm_sram_controller_tb
+// Module Name: avs_sram_controller_tb
 //
 // Author: Heqing Huang
 // Date Created: 10/10/2020
 //
 //  ================== Revision 1.0 ==================
-//  Testbench for the avm_sram_controller
+//  Testbench for the avs_sram_controller
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -17,19 +17,19 @@
 
 `define PERIOD 25
 
-module avm_sram_controller_tb();
+module avs_sram_controller_tb();
 
     // clk and reset
     reg                 clk;
     reg                 reset;
 
     // Avalon MM slave interface
-    reg  [18:0]         avm_address;
-    reg  [3:0]          avm_byteenable;
-    reg                 avm_read;
-    reg                 avm_write;
-    reg  [31:0]         avm_writedata;
-    wire [31:0]         avm_readdata;
+    reg  [18:0]         avs_address;
+    reg  [3:0]          avs_byteenable;
+    reg                 avs_read;
+    reg                 avs_write;
+    reg  [31:0]         avs_writedata;
+    wire [31:0]         avs_readdata;
 
     // SRAM interface
     wire [17:0]         sram_addr;
@@ -46,11 +46,11 @@ module avm_sram_controller_tb();
     initial
     begin
         error = 0;
-        avm_address = 0;
-        avm_byteenable = 0;
-        avm_read = 0;
-        avm_write = 0;
-        avm_writedata = 0;
+        avs_address = 0;
+        avs_byteenable = 0;
+        avs_read = 0;
+        avs_write = 0;
+        avs_writedata = 0;
         clk = 0;
         reset = 1;
     end
@@ -63,41 +63,41 @@ module avm_sram_controller_tb();
         #1 reset = 0;
         @(posedge clk);
         // write data into sram
-        avm_write_op('h0, 4'b1111, 'hcccc0123, 0);
-        avm_write_op('h4, 4'b1111, 'hbbbbaaaa, 0);
-        avm_read_op('h4, 4'b1111, 'hbbbbaaaa);
-        avm_write_op('h8, 4'b1111, 'h12344567, 0);
-        avm_write_op('hc, 4'b1111, 'h0000abcd, 0);
-        avm_write_op('h20, 4'b1111, 'hdeadbeef, 0);
-        avm_read_op('h0, 4'b1111, 'hcccc0123);
-        avm_read_op('h8, 4'b1111, 'h12344567);
-        avm_read_op('h20, 4'b1111, 'hdeadbeef);
-        avm_read_op('hc, 4'b1111, 'h0000abcd);
-        avm_read_op('h4, 4'b1111, 'hbbbbaaaa);
-        avm_write_op('h20, 4'b0011, 'h0000ffff, 0);
-        avm_read_op('h20, 4'b1111, 'hdeadffff);
-        avm_write_op('h10, 4'b1111, 'h12345678, 0);
-        avm_write_op('h10, 4'b1000, 'hff345678, 0);
-        avm_read_op('h10, 4'b0011, 'hff345678);
+        avs_write_op('h0, 4'b1111, 'hcccc0123, 0);
+        avs_write_op('h4, 4'b1111, 'hbbbbaaaa, 0);
+        avs_read_op('h4, 4'b1111, 'hbbbbaaaa);
+        avs_write_op('h8, 4'b1111, 'h12344567, 0);
+        avs_write_op('hc, 4'b1111, 'h0000abcd, 0);
+        avs_write_op('h20, 4'b1111, 'hdeadbeef, 0);
+        avs_read_op('h0, 4'b1111, 'hcccc0123);
+        avs_read_op('h8, 4'b1111, 'h12344567);
+        avs_read_op('h20, 4'b1111, 'hdeadbeef);
+        avs_read_op('hc, 4'b1111, 'h0000abcd);
+        avs_read_op('h4, 4'b1111, 'hbbbbaaaa);
+        avs_write_op('h20, 4'b0011, 'h0000ffff, 0);
+        avs_read_op('h20, 4'b1111, 'hdeadffff);
+        avs_write_op('h10, 4'b1111, 'h12345678, 0);
+        avs_write_op('h10, 4'b1000, 'hff345678, 0);
+        avs_read_op('h10, 4'b0011, 'hff345678);
         repeat (5) @(posedge clk);
         print_result();
         $finish();
     end
 
-    avm_sram_controller DUT(.*);
+    avmm_sram_controller DUT(.*);
 
     sram_model sram_model(.*);
 
     initial
     begin
         $dumpfile("dump.vcd");
-        $dumpvars(0, avm_sram_controller_tb);
+        $dumpvars(0, avs_sram_controller_tb);
         //for (integer idx = 0; idx < 40; idx = idx + 1) begin
-        //    $dumpvars(0, avm_sram_controller_tb.sram_model.sram[idx]);
+        //    $dumpvars(0, avs_sram_controller_tb.sram_model.sram[idx]);
         //end
     end
 
-    task avm_write_op;
+    task avs_write_op;
         input [18:0] addr;
         input [3:0]  byte;
         input [31:0] data;
@@ -105,49 +105,49 @@ module avm_sram_controller_tb();
         begin
             $display("Avalon MM write access. Address: %d, Data %h", addr, data);
             #1;
-            avm_address = addr;
-            avm_byteenable = byte;
-            avm_read = 0;
-            avm_write = 1;
-            avm_writedata = data;
+            avs_address = addr;
+            avs_byteenable = byte;
+            avs_read = 0;
+            avs_write = 1;
+            avs_writedata = data;
             @(posedge clk);
             #1;
-            avm_address = 0;
-            avm_byteenable = 0;
-            avm_read = 0;
-            avm_write = 0;
-            avm_writedata = 0;
+            avs_address = 0;
+            avs_byteenable = 0;
+            avs_read = 0;
+            avs_write = 0;
+            avs_writedata = 0;
             repeat (2) @(posedge clk);
         end
     endtask
 
-    task avm_read_op;
+    task avs_read_op;
         input [18:0] addr;
         input [3:0]  byte;
         input [31:0] expected;
         begin
             //$display("Avalon MM read access.  Address: %d", addr);
             #1;
-            avm_address = addr;
-            avm_byteenable = byte;
-            avm_read = 1;
-            avm_write = 0;
+            avs_address = addr;
+            avs_byteenable = byte;
+            avs_read = 1;
+            avs_write = 0;
             @(posedge clk);
             #1;
-            avm_address = 0;
-            avm_byteenable = 0;
-            avm_read = 0;
-            avm_write = 0;
+            avs_address = 0;
+            avs_byteenable = 0;
+            avs_read = 0;
+            avs_write = 0;
             repeat (2) @(posedge clk);
             #1;
-            if (expected !== avm_readdata) begin
+            if (expected !== avs_readdata) begin
                 $display("ERROR: Read data mismatch. Address: %d, Expected Data %h, Actual Data %h",
-                          addr, expected, avm_readdata);
+                          addr, expected, avs_readdata);
                 error = 1;
             end
             else begin
                 $display("Read data matches.      Address: %d, Expected Data %h, Actual Data %h",
-                          addr, expected, avm_readdata);
+                          addr, expected, avs_readdata);
             end
         end
     endtask

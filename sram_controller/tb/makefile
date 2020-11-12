@@ -10,7 +10,7 @@ TB_PATH  = ./
 ALL_SRC_FILES = $(shell find $(RTL_PATH) -type f)
 
 ifeq ($(TOP),)
-	TOP_DESIGN	= avm_vram_controller
+	TOP_DESIGN	= avmm_sram_controller
 else
 	TOP_DESIGN	= $(TOP)
 endif

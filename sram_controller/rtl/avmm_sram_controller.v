@@ -3,7 +3,7 @@
 // Copyright 2020 by Heqing Huang (feipenghhq@gamil.com)
 //
 // Project Name: N/A
-// Module Name: avm_sram_controller
+// Module Name: avs_sram_controller
 //
 // Author: Heqing Huang
 // Date Created: 10/10/2020
@@ -19,7 +19,7 @@
 //
 //  **** Important ****
 //
-//  1. The avm_address input should be a byte address, not a word address.
+//  1. The avs_address input should be a byte address, not a word address.
 //     So when you create a QSYS component of this IP, the address unit should be "SYMBOL"
 //     And the bit per symbol is 8.
 //     This is very important for this IP to work
@@ -48,19 +48,19 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-module avm_sram_controller
+module avmm_sram_controller
 (
     // clk and reset
     input                   clk,
     input                   reset,
 
     // Avalon MM slave interface
-    input      [18:0]       avm_address,    // Support 512KByte Address Range,  byte address
-    input      [3:0]        avm_byteenable,
-    input                   avm_read,
-    input                   avm_write,
-    input      [31:0]       avm_writedata,
-    output reg [31:0]       avm_readdata,
+    input      [18:0]       avs_address,    // Support 512KByte Address Range,  byte address
+    input      [3:0]        avs_byteenable,
+    input                   avs_read,
+    input                   avs_write,
+    input      [31:0]       avs_writedata,
+    output reg [31:0]       avs_readdata,
 
     // SRAM interface
     output reg [17:0]       sram_addr,
@@ -91,7 +91,7 @@ module avm_sram_controller
         end
         else begin
             case(state)
-                S_IDLE:     state <= (avm_read || avm_write) ? S_DW0 : S_IDLE;
+                S_IDLE:     state <= (avs_read || avs_write) ? S_DW0 : S_IDLE;
                 S_DW0:      state <= S_DW1;
                 S_DW1:      state <= S_IDLE;
                 default:    state <= S_IDLE;
@@ -103,24 +103,24 @@ module avm_sram_controller
     // Avalon MM slave interface
     // ******************************
 
-    reg [17:0]              avm_address_dw1;
-    reg [1:0]               avm_byteenable_dw1;
-    reg [15:0]              avm_writedata_dw1;
+    reg [17:0]              avs_address_dw1;
+    reg [1:0]               avs_byteenable_dw1;
+    reg [15:0]              avs_writedata_dw1;
 
     always @(posedge clk)
     begin
         case(state)
             S_IDLE:begin // Idle state, capture the input
-                avm_writedata_dw1   <= avm_writedata[31:16];
-                avm_byteenable_dw1  <= avm_byteenable[3:2];
-                // the SRAM is arranged as 256K x 16b so the LSb from avm_address is not used
-                avm_address_dw1     <= avm_address[18:1] | 17'h1;
+                avs_writedata_dw1   <= avs_writedata[31:16];
+                avs_byteenable_dw1  <= avs_byteenable[3:2];
+                // the SRAM is arranged as 256K x 16b so the LSb from avs_address is not used
+                avs_address_dw1     <= avs_address[18:1] | 17'h1;
             end
             S_DW0:begin // DW1 is availabe at the end of S_CAPTURE state
-                avm_readdata[15:0]  <= sram_readdata;
+                avs_readdata[15:0]  <= sram_readdata;
             end
             S_DW1:begin // DW1 is availabe at the end of S_CAPTURE state
-                avm_readdata[31:16] <= sram_readdata;
+                avs_readdata[31:16] <= sram_readdata;
             end
         endcase
     end
@@ -141,20 +141,20 @@ module avm_sram_controller
         else begin
             case(state)
                 S_IDLE:begin // Idle state, capture the input
-                    sram_ce_n   <= ~(avm_read | avm_write);
-                    sram_oe_n   <= ~avm_read;
-                    sram_we_n   <= ~avm_write;
-                    sram_ub_n   <= ~avm_byteenable[1];
-                    sram_lb_n   <= ~avm_byteenable[0];
-                    sram_writedata  <= avm_writedata[15:0];
-                    // Note: the SRAM is arranged as 256K x 16b so the LSb from avm_address is not used
-                    sram_addr   <= avm_address[18:1];
+                    sram_ce_n   <= ~(avs_read | avs_write);
+                    sram_oe_n   <= ~avs_read;
+                    sram_we_n   <= ~avs_write;
+                    sram_ub_n   <= ~avs_byteenable[1];
+                    sram_lb_n   <= ~avs_byteenable[0];
+                    sram_writedata  <= avs_writedata[15:0];
+                    // Note: the SRAM is arranged as 256K x 16b so the LSb from avs_address is not used
+                    sram_addr   <= avs_address[18:1];
                 end
                 S_DW0:begin
-                    sram_ub_n   <= ~avm_byteenable_dw1[1];
-                    sram_lb_n   <= ~avm_byteenable_dw1[0];
-                    sram_addr   <= avm_address_dw1;
-                    sram_writedata  <= avm_writedata_dw1;
+                    sram_ub_n   <= ~avs_byteenable_dw1[1];
+                    sram_lb_n   <= ~avs_byteenable_dw1[0];
+                    sram_addr   <= avs_address_dw1;
+                    sram_writedata  <= avs_writedata_dw1;
                 end
                 S_DW1:begin
                     sram_ce_n <= 1'b1;
